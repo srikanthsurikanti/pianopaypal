@@ -6,9 +6,10 @@
 This project demonstrates a dynamic checkout payment flow, where the calling page does not include any code
 specific to a given payment provider.
 
-The service, on receipt of a checkout request, based on the agency id in that request object (for now, could be a header),
-will return a query object, similar to an Ajax payload, that the client page can use to redirect the user to the
-provider's checkout page (hosted payment page), independent of our services, and is thus PCI-compliant.
+The service, on receipt of a checkout request, uses the supplied agency id (for now, request object, 
+but could be a header), will return a query object, similar to an Ajax payload, that the client page can use to 
+redirect the user to the provider's checkout page (hosted payment page), independent of our services, 
+and is thus PCI-compliant.
 
 ## Checkout Payment Request
 ### `POST /pianoforte/api/payment/checkout`
