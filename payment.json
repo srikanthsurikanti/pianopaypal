@@ -1,0 +1,8 @@
+{
+  "url" : "https://sandbox.paymentsgateway.net/swp/co/default.aspx",
+  "method" : "POST",
+  "headers" : [
+    {"XXX" : "YYY"}
+  ],
+  "body" : ""
+}

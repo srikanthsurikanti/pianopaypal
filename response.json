@@ -1,0 +1,19 @@
+{
+  "data": [
+    {"pg_billto_postal_name_first": "Max"},
+    {"pg_billto_postal_name_last": "Krall"},
+    {"pg_api_login_id": "9F3FA809B8"},
+    {"pg_transaction_type": "10"},
+    {"pg_version_number": "1.0"},
+    {"pg_total_amount": "1234.54"},
+    {"pg_utc_time": "637217008961160000"},
+    {"pg_transaction_order_number": "urn:test-agency:transaction-id:1586104095824"},
+    {"pg_ts_hash": "7E6EC69499589F2A732CBF69F7E83DDF"},
+    {"pg_return_url": "http://localhost:9090/api/payment/return"},
+    {"pg_continue_url": "http://localhost:9090/api/payment/continue"},
+    {"pg_cancel_url": "http://localhost:9090/api/payment/cancel"}
+  ],
+  "url": "https://sandbox.paymentsgateway.net/swp/co/default.aspx",
+  "method": "POST",
+  "contentType": "application/x-www-form-urlencoded"
+}

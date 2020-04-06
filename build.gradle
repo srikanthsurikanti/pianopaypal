@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.10.1'
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    camelVersion = "3.1.0"
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    implementation "org.apache.camel:camel-core:${camelVersion}"
+    implementation "org.apache.camel:camel-endpointdsl:${camelVersion}"
+    implementation "org.apache.camel:camel-main:${camelVersion}"
+    implementation "org.apache.camel:camel-jetty:${camelVersion}"
+    implementation "org.apache.camel:camel-http:${camelVersion}"
+    implementation "org.apache.camel:camel-jackson:${camelVersion}"
+    implementation "com.google.guava:guava:28.2-jre"
+    implementation "io.vavr:vavr:0.10.2"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testImplementation "org.apache.camel:camel-test-junit5:${camelVersion}"
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    afterEvaluate {
+        classDirectories.from = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/PianoForte.class',
+                    '**/common/**'
+            ])
+        })
+    }
+}
