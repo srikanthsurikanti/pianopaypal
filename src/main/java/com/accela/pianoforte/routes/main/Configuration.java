@@ -2,8 +2,6 @@ package com.accela.pianoforte.routes.main;
 
 import io.vavr.control.Try;
 
-import java.io.IOException;
-import java.util.Objects;
 import java.util.Properties;
 
 public class Configuration {
