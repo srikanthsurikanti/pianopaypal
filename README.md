@@ -8,10 +8,12 @@ specific to a given payment provider.
 
 The service, on receipt of a checkout request, based on the agency id in that request object (for now, could be a header),
 will return a query object, similar to an Ajax payload, that the client page can use to redirect the user to the
-provider's checkout page (hosted payment page), independent of our services (PCI-compliant)
+provider's checkout page (hosted payment page), independent of our services, and is thus PCI-compliant.
 
 ## Checkout Payment Request
 ### `POST /pianoforte/api/payment/checkout`
+The client page, to initiate 'checkout' should post the following message to the payment adapter, detailing the payer's
+name and amount.
 ```json
 {
   "firstName": "Max",
@@ -21,8 +23,16 @@ provider's checkout page (hosted payment page), independent of our services (PCI
   "amount": 123.34
 }
 ```
+This example currently sets the agency Id and transaction Id in the message body.  Consider sending these as headers.
+The transaction Id is generated in the client page in this POC, but should perhaps be provided by the Platform, e.g.,
+the Id of the transaction being payed for (a database record's PK?).
 
 ## Checkout Payment Response
+On receipt of the request above, the Payment Adapter should determine the provider from the agency id, and enrich the
+request with the values needed to invoke the payment providers checkout page.  This includes secrets, timestamp,
+hash code and call-back URLs.
+
+It also details the URL, method and content-type needed to open that page in the browser.
 ```json
 {
   "data": [
@@ -43,9 +53,16 @@ provider's checkout page (hosted payment page), independent of our services (PCI
   "method": "POST",
   "contentType": "application/x-www-form-urlencoded"
 }
-````
+```
+On receiving this response, it is the responsibility of the client to execute the call, using the parameters supplied.
+The format used is based on jQuery/Ajax and could possible be invoked directly, although this may have CORS issues if
+the provider doesn't support CORS.  For this POC, the client page builds an invisible DOM form and submits that, as if
+it was a regular form.
 ## Example Client script
 See [example payment page](src/main/resources/paymentPage.html)
+
+Here. when the inital request is submitted successfully, the `success` function uses the data returned from the payment
+adapter to dynamically build and submit a form.
 
 ```javascript
 function doRedirect() {
@@ -68,7 +85,7 @@ function doRedirect() {
 }
 ```
 ## PayPal
-ToDo...
+ToDo... PayPay uses as similar form-based request model, as does Stripe
 ```html
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
     <input type="hidden" name="cmd" value="_xclick">
