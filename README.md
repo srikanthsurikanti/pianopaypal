@@ -2,6 +2,10 @@
 This project demonstrates a dynamic checkout payment flow, where the calling page does not include any code
 specific to a given payment provider.
 
+[![Build Status](https://travis-ci.org/sothach/pianoforte.svg?branch=master)](https://travis-ci.org/sothach/pianoforte)
+[![Coverage Status](https://coveralls.io/repos/github/sothach/pianoforte/badge.svg?branch=master)](https://coveralls.io/github/sothach/pianoforte?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bb4d91d0da86443c85d58bbf225189a8)](https://www.codacy.com/manual/sothach/pianoforte?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sothach/pianoforte&amp;utm_campaign=Badge_Grade)
+
 The service, on receipt of a checkout request, based on the agency id in that request object (for now, could be a header),
 will return a query object, similar to an Ajax payload, that the client page can use to redirect the user to the
 provider's checkout page (hosted payment page), independent of our services (PCI-compliant)
