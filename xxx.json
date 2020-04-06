@@ -1,8 +1,0 @@
-{
-  "data": "pg_billto_postal_name_first=Kral&pg_billto_postal_name_last=Marx&pg_api_login_id=9F3FA809B8&pg_transaction_type=10&pg_version_number=1.0&pg_total_amount=1099.71&pg_utc_time=637216148727640000&pg_transaction_order_number=158601807276410.7174543576754028&pg_ts_hash=9F9D73B0A84F12AA0453A7E7BC82C3CB&pg_return_url=https%3A%2F%2Fsso.dev.accela.com%2F&pg_continue_url=http%3A%2F%2Flocalhost%2Fforte%2Fcontinue.php&pg_cancel_url=http%3A%2F%2Flocalhost%2Fforte%2Fcancel.php",
-  "url": "https://sandbox.paymentsgateway.net/swp/co/default.aspx",
-  "type": "POST",
-  "datatype": "HTML",
-  "crossDomain": true,
-  "contentType": "application/x-www-form-urlencoded; charset=ISO-8859-1"
-}
