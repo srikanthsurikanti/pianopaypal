@@ -1,6 +1,6 @@
 package com.accela.pianoforte.routes;
 
-import com.accela.pianoforte.routes.main.Configuration;
+import com.accela.pianoforte.routes.main.AppConfig;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import io.vavr.control.Try;
@@ -12,14 +12,18 @@ import static org.apache.camel.Exchange.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.TEXT_HTML;
 
 public class ApiRoute extends RouteBuilder {
-    private static Configuration config = new Configuration("/route.properties");
+    private final AppConfig appConfig;
+
+    public ApiRoute(final AppConfig appConfig) {
+        this.appConfig = appConfig;
+    }
 
     @Override
     public void configure() {
         restConfiguration()
                 .component("jetty")
-                .contextPath(config.getRestContextPath())
-                .port(config.getRestServerPort());
+                .contextPath(appConfig.getRestContextPath())
+                .port(appConfig.getRestLocalPort());
 
         rest("/").id("home")
                 .get("/checkout")
@@ -27,12 +31,12 @@ public class ApiRoute extends RouteBuilder {
                     .setBody().simple(getPaymentPage())
                     .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
 
-        rest(config.getRestBase()).id("api-route")
-                .post(config.getRestCheckoutPayment())
+        rest(appConfig.getRestBase()).id("api-route")
+                .post(appConfig.getRestCheckoutPayment())
                     .to("direct:payment-checkout")
-                .post(config.getRestReturnUrl())
+                .post(appConfig.getRestReturnUrl())
                     .to("log:com.accela?level=INFO&showAll=true")
-                .post(config.getRestCancelUrl())
+                .post(appConfig.getRestCancelUrl())
                     .to("log:com.accela?level=INFO&showAll=true");
     }
 

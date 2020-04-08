@@ -2,38 +2,34 @@ package com.accela.pianoforte.routes.model;
 
 import com.accela.pianoforte.routes.common.HMacMD5;
 import com.accela.pianoforte.routes.common.UTCTicks;
-import com.accela.pianoforte.routes.main.Configuration;
+import com.accela.pianoforte.routes.main.AppConfig;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class RequestFormBuilder {
-    private final Supplier<Instant> timestamper;
-    private final String apiLoginId;
-    private final String transactionType;
-    private final String apiVersion;
+    private final Supplier<OffsetDateTime> timestamper;
+    private final AppConfig appConfig;
     private final String securityKey;
-    private final String returnUrl;
-    private final String continueUrl;
-    private final String cancelUrl;
 
-    public RequestFormBuilder(final Supplier<Instant> timestamper,
-                              final Configuration configuration) {
+    public RequestFormBuilder(final Supplier<OffsetDateTime> timestamper,
+                              final AppConfig appConfig) {
         this.timestamper = timestamper;
-        this.apiLoginId = configuration.getApiLoginId();
-        this.transactionType = configuration.getTransactionType();
-        this.apiVersion = configuration.getApiVersion();
-        this.securityKey = configuration.getSecurityKey();
-        final String baseUrl = configuration.getBaseUrl();
-        this.returnUrl = baseUrl+configuration.getRestReturnUrl();
-        this.continueUrl = baseUrl+configuration.getRestContinueUrl();
-        this.cancelUrl = baseUrl+configuration.getRestCancelUrl();
+        this.appConfig = appConfig;
+        this.securityKey = appConfig.getSecurityKey();
     }
 
     public Map<String,String> build(final Request request) {
+        final String apiLoginId = appConfig.getApiLoginId();
+        final String transactionType = appConfig.getTransactionType();
+        final String apiVersion = appConfig.getApiVersion();
+        final String baseUrl = appConfig.getBaseUrl();
+        final String restBase = appConfig.getRestBase();
+        final String returnUrl = baseUrl + restBase + appConfig.getRestReturnUrl();
+        final String cancelUrl = baseUrl + restBase + appConfig.getRestCancelUrl();
         final String utcTime = UTCTicks.getUtcTime(timestamper.get()).toString();
         final String pgTsHash = calculateHash(
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,
@@ -49,7 +45,7 @@ public class RequestFormBuilder {
                 .put("pg_transaction_order_number", request.getTransactionId())
                 .put("pg_ts_hash", pgTsHash)
                 .put("pg_return_url", returnUrl)
-                .put("pg_continue_url", continueUrl)
+                .put("pg_continue_url", request.getContinueUrl())
                 .put("pg_cancel_url", cancelUrl)
                 .build();
     }

@@ -1,0 +1,18 @@
+<configuration debug="true">
+    <appender name="STDOUT" target="System.out" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern><![CDATA[
+             %d | %contextName | %14.14thread | %5.5level | %class{36}.%M | %msg %n
+           ]]></pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.accela" level="DEBUG" />
+    <logger name="org.apache.camel" level="INFO" />
+    <logger name="org.eclipse.jetty" level="WARN" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

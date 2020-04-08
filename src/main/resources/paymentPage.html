@@ -84,9 +84,14 @@
                     lastName: $('#lastName').val(),
                     agency: $('#agency').val(),
                     amount: $('#amount').val(),
-                    transactionId: Date.now()
+                    transactionId: Date.now(),
+                    continueUrl: window.location.href
                 }),
-                success: doRedirect()
+                success: doRedirect(),
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(
+                        "error posting payment form, " + textStatus + ": " + errorThrown);
+                }
             });
         });
     });

@@ -1,37 +1,69 @@
-import com.accela.pianoforte.routes.PaymentRoute;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.accela.pianoforte.routes.ApiRoute;
+import com.accela.pianoforte.routes.main.AppConfig;
+import io.vavr.control.Try;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
+import java.net.ServerSocket;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PaymentApiTest extends CamelTestSupport {
-    private static final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    private static final String txOrderNb = Long.toString(timestamp.getTime());
+    private static final AppConfig testConfig = getConfiguration();
+    private static final String endpoint =String.format(
+            "http://localhost:%s/pianoforte/api/payment/checkout", testConfig.getRestLocalPort());
     private static final String jsonRequest =
-            "{\"firstName\":\"Karl\",\"lastName\":\"Marx\"," +
-                    "\"agency\":\"test-agency\"," +
-                    "\"transactionId\":\""+txOrderNb+"\",\"amount\":123.34}";
-    @Test
-    @DisplayName("Payment initialize request should redirect payment page URL from provider")
-    public void testPaymentInitialize() {
-        final JsonNode result = template.requestBodyAndHeader(
-                "direct:payment-checkout", jsonRequest,
-                Exchange.CONTENT_TYPE, "application/json", JsonNode.class);
+            "{\"firstName\":\"Karl\",\"lastName\":\"Marx\",\"agency\":\"test-agency\"," +
+                    "\"transactionId\":\"1586197589861\"," +
+                    "\"continueUrl\":\"http://localhost:9090/pianoforte/checkout\"," +
+                    "\"amount\":123.34}";
 
-        System.out.println("result="+result.toPrettyString());
+    @Test
+    @DisplayName("API call succeeds")
+    public void testPaymentRequestProviderNotConfigured() {
+        final String result = template.requestBodyAndHeader(endpoint,
+                jsonRequest, Exchange.CONTENT_TYPE, "application/json", String.class);
+        assertEquals(checkoutQuery,result);
     }
 
     @Override
     protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                context.addRoutes(new PaymentRoute());
+                context.addRoutes(new ApiRoute(testConfig));
+                from("direct:payment-checkout")
+                        .setBody().simple(checkoutQuery);
             }
         };
     }
+
+    private static AppConfig getConfiguration() {
+        return Try.of(() -> {
+            final AppConfig result = new AppConfig("/route.properties");
+            final Integer localPort = Try.of(() -> (new ServerSocket(0)).getLocalPort()).get();
+            result.update(AppConfig.REST_LOCAL_PORT, Integer.toString(localPort));
+            return result;
+        }).get();
+    }
+
+    private static String checkoutQuery =
+            "{\"data\":[" +
+                "{\"pg_billto_postal_name_first\":\"Karl\"}," +
+                "{\"pg_billto_postal_name_last\":\"Marx\"}," +
+                "{\"pg_api_login_id\":\"9F3FA809B8\"}," +
+                "{\"pg_transaction_type\":\"10\"}," +
+                "{\"pg_version_number\":\"1.0\"},{\"pg_total_amount\":\"123.34\"}," +
+                "{\"pg_utc_time\":\"637219276208950000\"}," +
+                "{\"pg_transaction_order_number\":\"urn:test-agency:transaction-id:1586197589861\"}," +
+                "{\"pg_ts_hash\":\"BB1AF00676B1FF5585F8192D4A942672\"}," +
+                "{\"pg_return_url\":\"http://localhost:9090/pianoforte/api/payment/return\"}," +
+                "{\"pg_continue_url\":\"http://localhost:9090/pianoforte/checkout\"}," +
+                "{\"pg_cancel_url\":\"http://localhost:9090/pianoforte/api/payment/cancel\"}]," +
+            "\"url\":\"https://sandbox.paymentsgateway.net/swp/co/default.aspx\"," +
+            "\"method\":\"POST\"," +
+            "\"contentType\":\"application/x-www-form-urlencoded\"}";
 
 }
