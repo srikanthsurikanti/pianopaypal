@@ -9,14 +9,13 @@ public class AppConfig {
     public static final String SECURITY_KEY = "security-key";
     public static final String API_VERSION = "api-version";
     public static final String API_LOGIN_ID = "api-login-id";
-    public static final String TRANSACTION_TYPE = "transaction-type";
+    public static final String TRANSACTION_CCARD_SALE = "transaction-ccard-sale";
     public static final String REST_CONTEXT_PATH = "rest-context-path";
     public static final String REST_SERVER_HOST = "rest-server-host";
     public static final String REST_LOCAL_PORT = "rest-local-port";
     public static final String REST_BASE = "rest-base";
     public static final String REST_CHECKOUT_PAYMENT = "rest-checkout-payment";
     public static final String REST_RETURN_URL = "rest-return-url";
-    public static final String REST_CANCEL_URL = "rest-cancel-url";
     private final Properties appProps;
 
     public AppConfig(final String propertyFile) {
@@ -48,7 +47,7 @@ public class AppConfig {
     }
 
     public String getTransactionType() {
-        return appProps.getProperty(TRANSACTION_TYPE, "");
+        return appProps.getProperty(TRANSACTION_CCARD_SALE, "");
     }
 
     public String getRestContextPath() {
@@ -77,9 +76,5 @@ public class AppConfig {
 
     public String getRestReturnUrl() {
         return appProps.getProperty(REST_RETURN_URL, "");
-    }
-
-    public String getRestCancelUrl() {
-        return appProps.getProperty(REST_CANCEL_URL, "");
     }
 }

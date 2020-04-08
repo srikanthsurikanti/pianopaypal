@@ -12,24 +12,24 @@ import java.util.function.Supplier;
 
 public class RequestFormBuilder {
     private final Supplier<OffsetDateTime> timestamper;
-    private final AppConfig appConfig;
     private final String securityKey;
+    private final String apiLoginId;
+    private final String transactionType;
+    private final String apiVersion;
+    private final String returnUrl;
 
     public RequestFormBuilder(final Supplier<OffsetDateTime> timestamper,
-                              final AppConfig appConfig) {
+                              final AppConfig config) {
         this.timestamper = timestamper;
-        this.appConfig = appConfig;
-        this.securityKey = appConfig.getSecurityKey();
+        this.securityKey = config.getSecurityKey();
+        this.apiLoginId = config.getApiLoginId();
+        this.transactionType = config.getTransactionType();
+        this.apiVersion = config.getApiVersion();
+        this.returnUrl =
+                config.getBaseUrl() + config.getRestBase() + config.getRestReturnUrl();
     }
 
     public Map<String,String> build(final Request request) {
-        final String apiLoginId = appConfig.getApiLoginId();
-        final String transactionType = appConfig.getTransactionType();
-        final String apiVersion = appConfig.getApiVersion();
-        final String baseUrl = appConfig.getBaseUrl();
-        final String restBase = appConfig.getRestBase();
-        final String returnUrl = baseUrl + restBase + appConfig.getRestReturnUrl();
-        final String cancelUrl = baseUrl + restBase + appConfig.getRestCancelUrl();
         final String utcTime = UTCTicks.getUtcTime(timestamper.get()).toString();
         final String pgTsHash = calculateHash(
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,
@@ -45,8 +45,9 @@ public class RequestFormBuilder {
                 .put("pg_transaction_order_number", request.getTransactionId())
                 .put("pg_ts_hash", pgTsHash)
                 .put("pg_return_url", returnUrl)
-                .put("pg_continue_url", request.getContinueUrl())
-                .put("pg_cancel_url", cancelUrl)
+                .put("pg_continue_url", request.getClientLocation())
+                .put("pg_cancel_url", request.getClientLocation()+"/failure")
+                .put("pg_return_method", "AsyncPost")
                 .build();
     }
 

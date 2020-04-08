@@ -85,7 +85,8 @@
                     agency: $('#agency').val(),
                     amount: $('#amount').val(),
                     transactionId: Date.now(),
-                    continueUrl: window.location.href
+                    clientLocation: window.location.protocol + "//" + window.location.host
+                        + window.location.pathname
                 }),
                 success: doRedirect(),
                 error: function(XMLHttpRequest, textStatus, errorThrown) {

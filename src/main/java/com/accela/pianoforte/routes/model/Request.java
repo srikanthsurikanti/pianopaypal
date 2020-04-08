@@ -12,6 +12,6 @@ public class Request {
     private String firstName;
     private String lastName;
     private String transactionId;
-    private String continueUrl;
+    private String clientLocation;
     private BigDecimal amount;
 }

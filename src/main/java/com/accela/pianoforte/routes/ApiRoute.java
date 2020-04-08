@@ -27,21 +27,27 @@ public class ApiRoute extends RouteBuilder {
 
         rest("/").id("home")
                 .get("/checkout")
-                    .route()
-                    .setBody().simple(getPaymentPage())
-                    .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
+                    .to("direct:checkout-page")
+                .get("/checkout/failure")
+                    .to("direct:failure-page");
 
         rest(appConfig.getRestBase()).id("api-route")
                 .post(appConfig.getRestCheckoutPayment())
                     .to("direct:payment-checkout")
                 .post(appConfig.getRestReturnUrl())
-                    .to("log:com.accela?level=INFO&showAll=true")
-                .post(appConfig.getRestCancelUrl())
-                    .to("log:com.accela?level=INFO&showAll=true");
+                    .to("direct:payment-response");
+
+        from("direct:checkout-page")
+                .setBody().simple(loadPage("paymentPage.html"))
+                .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
+
+        from("direct:failure-page")
+                .setBody().simple(loadPage("failedPage.html"))
+                .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
     }
 
-    private static String getPaymentPage() {
-        final URL url = Resources.getResource("paymentPage.html");
+    private static String loadPage(final String pageName) {
+        final URL url = Resources.getResource(pageName);
         return Try.of(() -> Resources.toString(url, Charsets.UTF_8)).get();
     }
 
