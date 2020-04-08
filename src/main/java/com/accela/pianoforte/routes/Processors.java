@@ -5,7 +5,6 @@ import com.accela.pianoforte.routes.model.Request;
 import com.accela.pianoforte.routes.model.RequestFormBuilder;
 import com.accela.pianoforte.routes.model.Response;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vavr.control.Try;
@@ -37,9 +36,7 @@ public class Processors {
                         .set(entry.getKey(), factory.textNode(entry.getValue())))
                 .collect(Collectors.toList());
         final ObjectNode query = factory.objectNode();
-        final ArrayNode dataNode = factory.arrayNode();
-        dataNode.addAll(fields);
-        query.set("data", dataNode);
+        query.set("data", factory.arrayNode().addAll(fields));
         query.set("url", factory.textNode(appConfig.getCheckoutUrl()));
         query.set("method", factory.textNode("POST"));
         query.set("contentType", factory.textNode("application/x-www-form-urlencoded"));

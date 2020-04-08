@@ -38,7 +38,8 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("POST", result.get("method").asText());
         assertEquals("application/x-www-form-urlencoded", result.get("contentType").asText());
         assertEquals("https://sandbox.paymentsgateway.net/swp/co/default.aspx", result.get("url").asText());
-        final ArrayList<JsonNode> data = new ObjectMapper().convertValue(result.get("data"), new TypeReference<ArrayList<JsonNode>>(){});
+        final ArrayList<JsonNode> data = new ObjectMapper().convertValue(
+                result.get("data"), new TypeReference<ArrayList<JsonNode>>(){});
         final Map<String,String> fieldMap = data.stream()
                 .map(object -> object.fields().next())
                 .map(node -> new Tuple2<>(node.getKey(), node.getValue().asText()))
@@ -105,7 +106,7 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("TEST APPROVAL", result.get("responseText").asText());
         assertEquals("A01", result.get("responseCode").asText());
         assertEquals("A", result.get("responseType").asText());
-        assertEquals( "965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", result.get("traceNumber").asText());
+        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", result.get("traceNumber").asText());
         assertEquals("10", result.get("transactionType").asText());
         assertEquals("6RW586", result.get("authorizationCode").asText());
         assertEquals("urn:test-agency:transaction-id:1586338120514", result.get("transactionId").asText());
