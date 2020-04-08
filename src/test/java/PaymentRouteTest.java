@@ -63,13 +63,11 @@ public class PaymentRouteTest extends CamelTestSupport {
     protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                final Processors processors = new Processors(timestamper, new AppConfig("/route.properties"));
+                final Processors processors = new Processors(
+                        () -> OffsetDateTime.parse("2020-01-01T12:30Z"), new AppConfig("/route.properties"));
                 context.addRoutes(new PaymentRoute(processors));
             }
         };
     }
-
-    private static final Supplier<OffsetDateTime> timestamper = () ->
-            OffsetDateTime.parse("2020-01-01T12:30Z");
 
 }
