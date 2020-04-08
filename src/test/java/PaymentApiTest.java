@@ -8,12 +8,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.net.ServerSocket;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PaymentApiTest extends CamelTestSupport {
     private static final AppConfig testConfig = getConfiguration();
-    private static final String endpoint =String.format(
+    private static final String endpoint = String.format(
             "http://localhost:%s/pianoforte/api/payment/checkout", testConfig.getRestLocalPort());
     private static final String jsonRequest =
             "{\"firstName\":\"Karl\",\"lastName\":\"Marx\",\"agency\":\"test-agency\"," +
@@ -29,6 +31,28 @@ public class PaymentApiTest extends CamelTestSupport {
         assertEquals(checkoutQuery,result);
     }
 
+    @Test
+    @DisplayName("Checkout page served")
+    public void testCheckoutPage() {
+        final String pageAddress = String.format(
+                "http://localhost:%s/pianoforte/checkout", testConfig.getRestLocalPort());
+        final String result = template.requestBody(pageAddress, null, String.class);
+        assertTrue(result.contains("Provide Payer's Details for Checkout"));
+    }
+
+    @Test
+    @DisplayName("Response page served")
+    public void testResponsePage() {
+        final String pageAddress = String.format(
+                "http://localhost:%s/pianoforte/api/payment/return", testConfig.getRestLocalPort());
+        final String body = PaymentRouteTest.paymentResponse.entrySet().stream()
+                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                .collect(Collectors.joining("&"));
+        final String result = template.requestBody(pageAddress, body, String.class);
+        System.out.println(">>>>"+result);
+        assertEquals("{}", result);
+    }
+
     @Override
     protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
@@ -36,6 +60,8 @@ public class PaymentApiTest extends CamelTestSupport {
                 context.addRoutes(new ApiRoute(testConfig));
                 from("direct:payment-checkout")
                         .setBody().simple(checkoutQuery);
+                from("direct:payment-response")
+                        .setBody().simple("{}");
             }
         };
     }

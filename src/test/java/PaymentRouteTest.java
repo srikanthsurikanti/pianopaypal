@@ -62,7 +62,7 @@ public class PaymentRouteTest extends CamelTestSupport {
     }
 
 
-    private static final Map<String, Object> paymentResponse =
+    static final Map<String, Object> paymentResponse =
             ImmutableMap.<String, Object>builder()
                     .put("pg_billto_postal_name_company", "Accela+Ireland+Ltd.")
                     .put("pg_billto_postal_name_first", "Max")
