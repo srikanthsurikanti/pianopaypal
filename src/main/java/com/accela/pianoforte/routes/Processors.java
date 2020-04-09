@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Processors {
-    private static JsonNodeFactory factory = JsonNodeFactory.instance;
+    private static final JsonNodeFactory factory = JsonNodeFactory.instance;
     private final RequestFormBuilder formBuilder;
     private final AppConfig appConfig;
 
@@ -68,6 +68,6 @@ public class Processors {
                 .build(), Response.class);
     }
 
-    private static Function<Object,String> urldecoder = encoded ->
+    private static final Function<Object,String> urldecoder = encoded ->
             Try.of(() -> URLDecoder.decode(encoded.toString(), "UTF-8")).getOrElse(encoded.toString());
 }

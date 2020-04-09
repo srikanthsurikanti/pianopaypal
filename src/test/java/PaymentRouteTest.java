@@ -61,8 +61,7 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("http://localhost:9090/pianoforte/api/payment/return",fieldMap.get("pg_return_url"));
     }
 
-
-    static final Map<String, Object> paymentResponse =
+    private static final Map<String, Object> paymentResponse =
             ImmutableMap.<String, Object>builder()
                     .put("pg_billto_postal_name_company", "Accela+Ireland+Ltd.")
                     .put("pg_billto_postal_name_first", "Max")
@@ -89,18 +88,16 @@ public class PaymentRouteTest extends CamelTestSupport {
                     .put(Exchange.CONTENT_TYPE, "application/x-www-form-urlencoded")
                     .build();
 
+    static final String paymentResponseUrlencoded = paymentResponse.entrySet().stream()
+            .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining("&"));
+
     @Test
     @DisplayName("Payment response from provider should be transformed")
     public void testPaymentResponse() throws JsonProcessingException {
-        final String body = paymentResponse.entrySet().stream()
-                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining("&"));
         final String response = template.requestBodyAndHeaders(
-                "direct:payment-response", body, paymentResponse, String.class);
-        System.out.println("response="+response);
-
+                "direct:payment-response", paymentResponseUrlencoded, paymentResponse, String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
-        System.out.println("response="+result.toPrettyString());
 
         assertEquals("1200.0", result.get("amount").asText());
         assertEquals("TEST APPROVAL", result.get("responseText").asText());

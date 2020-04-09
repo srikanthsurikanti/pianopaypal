@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.net.ServerSocket;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,11 +44,8 @@ public class PaymentApiTest extends CamelTestSupport {
     public void testResponsePage() {
         final String pageAddress = String.format(
                 "http://localhost:%s/pianoforte/api/payment/return", testConfig.getRestLocalPort());
-        final String body = PaymentRouteTest.paymentResponse.entrySet().stream()
-                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining("&"));
-        final String result = template.requestBody(pageAddress, body, String.class);
-        System.out.println(">>>>"+result);
+        final String result = template.requestBody(
+                pageAddress, PaymentRouteTest.paymentResponseUrlencoded, String.class);
         assertEquals("{}", result);
     }
 
@@ -75,7 +71,7 @@ public class PaymentApiTest extends CamelTestSupport {
         }).get();
     }
 
-    private static String checkoutQuery =
+    private static final String checkoutQuery =
             "{\"data\":[" +
                 "{\"pg_billto_postal_name_first\":\"Karl\"}," +
                 "{\"pg_billto_postal_name_last\":\"Marx\"}," +

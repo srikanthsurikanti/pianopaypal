@@ -39,13 +39,11 @@ public class ApiRoute extends RouteBuilder {
 
         from("direct:checkout-page")
                 .setProperty("showPage", constant("paymentPage.html"))
-                .process(ApiRoute::streamPage)
-                .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
+                .process(ApiRoute::streamPage);
 
         from("direct:failure-page")
                 .setProperty("showPage", constant("failedPage.html"))
-                .process(ApiRoute::streamPage)
-                .setHeader(CONTENT_TYPE, simple(TEXT_HTML.toString()));
+                .process(ApiRoute::streamPage);
     }
 
     private static void streamPage(final Exchange exchange) {
@@ -53,6 +51,7 @@ public class ApiRoute extends RouteBuilder {
         final InputStream pageStream = Optional.ofNullable(exchange.getProperty("showPage", String.class))
                 .map(page -> ApiRoute.class.getClassLoader().getResourceAsStream("pages/"+page))
                 .orElse(new ByteArrayInputStream(page404.getBytes()));
+        exchange.getMessage().setHeader(CONTENT_TYPE, TEXT_HTML.toString());
         exchange.getMessage().setBody(pageStream, InputStream.class);
     }
 
