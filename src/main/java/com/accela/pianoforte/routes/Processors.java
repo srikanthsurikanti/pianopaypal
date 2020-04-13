@@ -1,6 +1,7 @@
 package com.accela.pianoforte.routes;
 
 import com.accela.pianoforte.main.AppConfig;
+import com.accela.pianoforte.model.Contact;
 import com.accela.pianoforte.model.Request;
 import com.accela.pianoforte.model.RequestFormBuilder;
 import com.accela.pianoforte.model.Response;
@@ -29,7 +30,7 @@ public class Processors {
         formBuilder = new RequestFormBuilder(timestamper, appConfig);
     }
 
-    protected void toJsonNode(final Exchange exchange) {
+    protected void toRedirectQuery(final Exchange exchange) {
         final Request request = exchange.getIn().getBody(Request.class);
         final List<JsonNode> fields = formBuilder.build(request).entrySet().stream()
                 .map(entry -> (ObjectNode) factory.objectNode()
@@ -43,42 +44,37 @@ public class Processors {
         exchange.getMessage().setBody(query.toString());
     }
 
-    protected void qualifyTXid(final Exchange exchange) {
-        final Request request = exchange.getIn().getBody(Request.class);
-        request.setTransactionId(String.format("urn:%s:transaction-id:%s",
-                request.getAgency(), request.getTransactionId()));
-    }
-
     protected void parseResponse(final Exchange exchange) {
         final Map<String, String> headers = exchange.getIn()
                 .getHeaders().entrySet().stream()
                     .filter(e -> e.getValue() instanceof String)
                     .collect(Collectors.toMap(Map.Entry::getKey,
                             entry -> urldecoder.apply(entry.getValue())));
-        exchange.getMessage().setBody(new Response(
-                new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")),
-                headers.get("pg_response_description"),
-                headers.get("pg_response_code"),
-                headers.get("pg_response_type"),
-                headers.get("pg_trace_number"),
-                headers.get("pg_transaction_type"),
-                headers.get("pg_authorization_code"),
-                headers.get("pg_transaction_order_number"),
-                headers.get("pg_billto_postal_name_company"),
-                headers.get("pg_billto_postal_name_first"),
-                headers.get("pg_billto_postal_name_last"),
-                headers.get("pg_billto_postal_street_line1"),
-                headers.get("pg_billto_postal_street_line2"),
-                headers.get("pg_billto_postal_city"),
-                headers.get("pg_billto_postal_stateprov"),
-                headers.get("pg_billto_postal_postalcode"),
-                headers.get("pg_billto_telecom_phone_number"),
-                headers.get("pg_billto_online_email"),
-                headers.get("pg_last4"),
-                headers.get("pg_payment_card_expdate_year"),
-                headers.get("pg_payment_card_expdate_month"),
-                headers.get("pg_payment_card_type")
-                ), Response.class);
+
+        exchange.getMessage().setBody(Response.builder()
+                .amount(new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")))
+                .responseText(headers.get("pg_response_description"))
+                .responseCode(headers.get("pg_response_code"))
+                .responseType(headers.get("pg_response_type"))
+                .traceNumber(headers.get("pg_trace_number"))
+                .transactionType(headers.get("pg_transaction_type"))
+                .authorizationCode(headers.get("pg_authorization_code"))
+                .transactionId(headers.get("pg_transaction_order_number"))
+                .firstName(headers.get("pg_billto_postal_name_first"))
+                .lastName(headers.get("pg_billto_postal_name_last"))
+                .contact(new Contact(
+                        headers.get("pg_billto_postal_name_company"),
+                        headers.get("pg_billto_postal_street_line1"),
+                        headers.get("pg_billto_postal_street_line2"),
+                        headers.get("pg_billto_postal_city"),
+                        headers.get("pg_billto_postal_stateprov"),
+                        headers.get("pg_billto_postal_postalcode"),
+                        headers.get("pg_billto_telecom_phone_number"),
+                        headers.get("pg_billto_online_email")))
+                .last4Digits(headers.get("pg_last4"))
+                .cardExpDateYear(headers.get("pg_payment_card_expdate_year"))
+                .cardExpDateMonth(headers.get("pg_payment_card_expdate_month"))
+                .cardType(headers.get("pg_payment_card_type")).build(), Response.class);
     }
 
     private static final Function<Object,String> urldecoder = encoded ->

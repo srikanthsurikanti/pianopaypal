@@ -1,6 +1,5 @@
 package com.accela.pianoforte.routes;
 
-import com.accela.pianoforte.model.Request;
 import com.accela.pianoforte.model.Response;
 import com.accela.pianoforte.services.TransactionStore;
 import org.apache.camel.Exchange;
@@ -27,18 +26,14 @@ public class PaymentRoute extends RouteBuilder {
         getContext().getGlobalOptions().put("CamelJacksonEnableTypeConverter", "true");
 
         from("direct:payment-checkout").routeId("checkout")
-                .convertBodyTo(Request.class)
-                .process(processors::qualifyTXid)
-                .process(processors::toJsonNode)
-                .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON))
-                .to("log:com.accela?level=INFO&showAll=true");
+                .process(processors::toRedirectQuery)
+                .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON));
 
         from("direct:payment-response")
                 .process(processors::parseResponse)
                 .process(this::storeResponse)
                 .marshal().json(JsonLibrary.Jackson)
                 .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON))
-                .to("log:com.accela?level=INFO&showAll=true")
                 .to("direct:platform");
 
         from("direct:platform")
@@ -46,7 +41,6 @@ public class PaymentRoute extends RouteBuilder {
                     logger.info("POST to platform => "+exch.getIn().getBody(String.class)));
 
         from("direct:transaction-query")
-                .to("log:com.accela?level=INFO&showAll=true")
                 .process(this::lookupResponse)
                 .marshal().json(JsonLibrary.Jackson)
                 .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON));

@@ -9,11 +9,11 @@
 <div class="wrapper">
     <nav id="sidebar">
         <div class="sidebar-header">
-            <b>COM-NEW-20-000224</b>
-            <p>2633 Camino Ramon</p>
+            <b>Kindle County</b>
+            <p>118 N Kindle St, Chicago, IL 60600</p>
         </div>
         <ul class="list-unstyled components">
-            <li href="#" class="option">Summary</li>
+            <li class="option">Summary</li>
             <li class="option">Record</li>
             <li class="option">Status</li>
             <li class="option">Activities (0)</li>
@@ -204,7 +204,7 @@
         console.log('data', data);
 
         setPaymentStatus(data['responseCode']);
-
+        let contact = data["contact"];
         $('#amount').val(currencyFormat(data["amount"]));
         $("#responseText").val(data["responseText"]);
         $("#responseCode").val(data["responseCode"]);
@@ -212,13 +212,13 @@
         $("#companyName").val(data["companyName"]);
         $("#firstName").val(data["firstName"]);
         $("#lastName").val(data["lastName"]);
-        $("#addressStreet1").val(data["addressStreet1"]);
-        $("#addressStreet2").val(data["addressStreet2"]);
-        $("#addressState").val(data["addressState"]);
-        $("#addressCity").val(data["addressCity"]);
-        $("#addressPostCode").val(data["addressPostCode"]);
-        $("#telephone").val(data["telephone"]);
-        $("#email").val(data["email"]);
+        $("#addressStreet1").val(contact["street1"]);
+        $("#addressStreet2").val(contact["street2"]);
+        $("#addressState").val(contact["state"]);
+        $("#addressCity").val(contact["city"]);
+        $("#addressPostCode").val(contact["postCode"]);
+        $("#telephone").val(contact["telephone"]);
+        $("#email").val(contact["email"]);
         $("#cardValidity").val(
             expiryFormat(data["cardExpDateMonth"],data["cardExpDateYear"]));
         $("#cardType").val(data["cardType"].toUpperCase());

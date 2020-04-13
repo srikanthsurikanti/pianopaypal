@@ -9,8 +9,8 @@
 <div class="wrapper">
     <nav id="sidebar">
         <div class="sidebar-header">
-            <b>COM-NEW-20-000224</b>
-            <p>2633 Camino Ramon</p>
+            <b>Kindle County</b>
+            <p>118 N Kindle St, Chicago, IL 60600</p>
         </div>
         <ul class="list-unstyled components">
             <li class="option">Summary</li>
@@ -145,7 +145,7 @@
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="agency" class="control-label">Comment</label>
-                                        <textarea type="text" class="form-control"
+                                        <textarea class="form-control"
                                                   id="agency" name="agency"></textarea>
                                     </div>
                                 </div>
@@ -196,14 +196,16 @@
                         lastName: $('#lastName').val(),
                         agency: $('#agency').val(),
                         amount: $('#amount').val(),
-                        company: $('#company').val(),
-                        addressStreet1: $('#streetAddress1').val(),
-                        addressStreet2: $('#streetAddress2').val(),
-                        addressCity: $('#city').val(),
-                        addressState: $('#state').val(),
-                        addressPostCode: $('#zip').val(),
-                        telephone: $('#phone').val(),
-                        email: $('#email').val(),
+                        contact: {
+                            company: $('#company').val(),
+                            street1: $('#streetAddress1').val(),
+                            street2: $('#streetAddress2').val(),
+                            city: $('#city').val(),
+                            state: $('#state').val(),
+                            postCode: $('#zip').val(),
+                            telephone: $('#phone').val(),
+                            email: $('#email').val()
+                        },
                         transactionId: Date.now(),
                         clientLocation: window.location.protocol + "//" + window.location.host
                             + window.location.pathname

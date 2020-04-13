@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.ServerSocket;
 
+import static fixtures.Fixtures.paymentResponseUrlencoded;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,7 +25,7 @@ public class PaymentApiTest extends CamelTestSupport {
 
     @Test
     @DisplayName("API call succeeds")
-    public void testPaymentRequestProviderNotConfigured() {
+    public void testPaymentRequest() {
         final String result = template.requestBodyAndHeader(endpoint,
                 jsonRequest, Exchange.CONTENT_TYPE, "application/json", String.class);
         assertEquals(checkoutQuery,result);
@@ -45,7 +46,7 @@ public class PaymentApiTest extends CamelTestSupport {
         final String pageAddress = String.format(
                 "http://localhost:%s/pianoforte/api/payment/return", testConfig.getRestLocalPort());
         final String result = template.requestBody(
-                pageAddress, PaymentRouteTest.paymentResponseUrlencoded, String.class);
+                pageAddress, paymentResponseUrlencoded, String.class);
         assertEquals("{}", result);
     }
 

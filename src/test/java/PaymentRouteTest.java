@@ -1,11 +1,10 @@
+import com.accela.pianoforte.main.AppConfig;
 import com.accela.pianoforte.routes.PaymentRoute;
 import com.accela.pianoforte.routes.Processors;
-import com.accela.pianoforte.main.AppConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import io.vavr.Tuple2;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -18,19 +17,25 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static fixtures.Fixtures.paymentResponse;
+import static fixtures.Fixtures.paymentResponseUrlencoded;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PaymentRouteTest extends CamelTestSupport {
+    private static final TypeReference<ArrayList<JsonNode>> typeWitness =
+            new TypeReference<ArrayList<JsonNode>>() {};
     private static final String jsonRequest =
             "{\"firstName\":\"Karl\",\"lastName\":\"Marx\"," +
-                    "\"agency\":\"test-agency\"," +
-                    "\"addressStreet1\":\"1, Main Street\"," +
-                    "\"addressCity\":\"Burton\"," +
-                    "\"addressState\":\"CA\"," +
-                    "\"addressPostCode\":\"12345\"," +
-                    "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
-                    "\"transactionId\":\"1586197589861\",\"amount\":123.34}";
+             "\"agency\":\"test-agency\"," +
+             "\"contact\": {" +
+                "\"street1\":\"1, Main Street\"," +
+                "\"city\":\"Burton\"," +
+                "\"state\":\"CA\"," +
+                "\"postCode\":\"12345\"" +
+             "}," +
+             "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
+             "\"transactionId\":\"1586197589861\",\"amount\":123.34}";
 
     @Test
     @DisplayName("Payment request should return redirect query document")
@@ -42,13 +47,7 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("POST", result.get("method").asText());
         assertEquals("application/x-www-form-urlencoded", result.get("contentType").asText());
         assertEquals("https://sandbox.paymentsgateway.net/swp/co/default.aspx", result.get("url").asText());
-        final ArrayList<JsonNode> data = new ObjectMapper().convertValue(
-                result.get("data"), new TypeReference<ArrayList<JsonNode>>(){});
-        final Map<String,String> fieldMap = data.stream()
-                .map(object -> object.fields().next())
-                .map(node -> new Tuple2<>(node.getKey(), node.getValue().asText()))
-                .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
-
+        final Map<String, String> fieldMap = mapResponse(result);
         assertEquals("Karl", fieldMap.get("pg_billto_postal_name_first"));
         assertEquals("Marx", fieldMap.get("pg_billto_postal_name_last"));
         assertEquals("9F3FA809B8", fieldMap.get("pg_api_login_id"));
@@ -56,9 +55,9 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("1.0", fieldMap.get("pg_version_number"));
         assertEquals("123.34", fieldMap.get("pg_total_amount"));
         assertEquals("637134786000000000", fieldMap.get("pg_utc_time"));
-        assertEquals("3A98C930C5620F4BF1BABEEEA46C7DC9", fieldMap.get("pg_ts_hash"));
         assertTrue(fieldMap.containsKey("pg_utc_time"));
         assertEquals("urn:test-agency:transaction-id:1586197589861",fieldMap.get("pg_transaction_order_number"));
+        assertEquals("3A98C930C5620F4BF1BABEEEA46C7DC9", fieldMap.get("pg_ts_hash"));
         assertTrue(fieldMap.containsKey("pg_ts_hash"));
         assertEquals(
                 "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
@@ -69,36 +68,13 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("http://localhost:9090/pianoforte/api/payment/return",fieldMap.get("pg_return_url"));
     }
 
-    private static final Map<String, Object> paymentResponse =
-            ImmutableMap.<String, Object>builder()
-                    .put("pg_billto_postal_name_company", "Accela+Ireland+Ltd.")
-                    .put("pg_billto_postal_name_first", "Max")
-                    .put("pg_billto_postal_name_last", "Krall")
-                    .put("pg_billto_postal_street_line1", "Beaux+Lane+House%2c+Mercer+Street+Lower")
-                    .put("pg_billto_postal_city", "Dublin")
-                    .put("pg_shipto_postal_name", "Max+Krall")
-                    .put("pg_shipto_postal_street_line1", "Beaux+Lane+House%2c+Mercer+Street+Lower")
-                    .put("pg_shipto_postal_city", "Dublin")
-                    .put("pg_total_amount", "1%2c200.00")
-                    .put("pg_response_description", "TEST+APPROVAL")
-                    .put("pg_response_code", "A01")
-                    .put("pg_response_type", "A")
-                    .put("pg_trace_number", "965fc3ec-f221-49ac-b54e-4e3fb4f3ce20")
-                    .put("pg_ts_hash_response", "9e3745626b5457d7fb9c882fd3ffbc92")
-                    .put("pg_utc_time", "637219349419991905")
-                    .put("pg_transaction_order_number", "urn%3atest-agency%3atransaction-id%3a1586338120514")
-                    .put("pg_transaction_type", "10")
-                    .put("pg_authorization_code", "6RW586")
-                    .put("pg_last4", "1111")
-                    .put("pg_payment_card_type", "visa")
-                    .put("pg_payment_card_expdate_month", "04")
-                    .put("pg_payment_card_expdate_year", "2020")
-                    .put(Exchange.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                    .build();
-
-    static final String paymentResponseUrlencoded = paymentResponse.entrySet().stream()
-            .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-            .collect(Collectors.joining("&"));
+    private Map<String, String> mapResponse(final JsonNode result) {
+        return new ObjectMapper().convertValue(result.get("data"), typeWitness)
+                .stream()
+                .map(object -> object.fields().next())
+                .map(node -> new Tuple2<>(node.getKey(), node.getValue().asText()))
+                .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
+    }
 
     @Test
     @DisplayName("Payment response from provider should be transformed")
