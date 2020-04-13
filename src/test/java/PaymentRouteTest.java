@@ -1,6 +1,7 @@
 import com.accela.pianoforte.main.AppConfig;
 import com.accela.pianoforte.routes.PaymentRoute;
 import com.accela.pianoforte.routes.Processors;
+import com.accela.pianoforte.services.TransactionStore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -115,7 +116,7 @@ public class PaymentRouteTest extends CamelTestSupport {
     protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                final Processors processors = new Processors(
+                final Processors processors = new Processors(new TransactionStore(),
                         () -> OffsetDateTime.parse("2020-01-01T12:30Z"), new AppConfig("/route.properties"));
                 context.addRoutes(new PaymentRoute(processors));
             }

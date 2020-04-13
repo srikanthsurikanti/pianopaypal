@@ -201,8 +201,6 @@
         });
     });
     function populate(data) {
-        console.log('data', data);
-
         setPaymentStatus(data['responseCode']);
         let contact = data["contact"];
         $('#amount').val(currencyFormat(data["amount"]));

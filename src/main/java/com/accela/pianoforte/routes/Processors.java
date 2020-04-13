@@ -5,6 +5,7 @@ import com.accela.pianoforte.model.Contact;
 import com.accela.pianoforte.model.Request;
 import com.accela.pianoforte.model.RequestFormBuilder;
 import com.accela.pianoforte.model.Response;
+import com.accela.pianoforte.services.TransactionStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,8 +25,11 @@ public class Processors {
     private static final JsonNodeFactory factory = JsonNodeFactory.instance;
     private final RequestFormBuilder formBuilder;
     private final AppConfig appConfig;
+    private final TransactionStore store;
 
-    public Processors(final Supplier<OffsetDateTime> timestamper, final AppConfig appConfig) {
+    public Processors(final TransactionStore store,
+                      final Supplier<OffsetDateTime> timestamper, final AppConfig appConfig) {
+        this.store = store;
         this.appConfig = appConfig;
         formBuilder = new RequestFormBuilder(timestamper, appConfig);
     }
@@ -76,6 +80,19 @@ public class Processors {
                 .cardExpDateMonth(headers.get("pg_payment_card_expdate_month"))
                 .cardType(headers.get("pg_payment_card_type")).build(), Response.class);
     }
+
+
+    protected void storeResponse(final Exchange exchange) {
+        store.add(exchange.getIn().getBody(Response.class));
+    }
+
+    protected void lookupResponse(final Exchange exchange) {
+        store.get(exchange.getIn().getHeader("id", String.class)).map(response -> {
+            exchange.getMessage().setBody(response, Response.class);
+            return null;
+        });
+    }
+
 
     private static final Function<Object,String> urldecoder = encoded ->
             Try.of(() -> URLDecoder.decode(encoded.toString(), "UTF-8")).getOrElse(encoded.toString());
