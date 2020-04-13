@@ -22,8 +22,8 @@ public class RequestFormBuilder {
     private final String apiVersion;
     private final String returnUrl;
 
-    public RequestFormBuilder(final Supplier<OffsetDateTime> timestamper,
-                              final AppConfig config) {
+    public RequestFormBuilder(
+            final Supplier<OffsetDateTime> timestamper, final AppConfig config) {
         this.timestamper = timestamper;
         this.securityKey = config.getSecurityKey();
         this.apiLoginId = config.getApiLoginId();
@@ -37,6 +37,8 @@ public class RequestFormBuilder {
         final String pgTsHash = calculateHash(
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,
                 request.getTransactionId(), apiVersion);
+        final String completionUrl = String.format("%s/complete/%s",
+                request.getClientLocation(), urlencoder.apply(request.getTransactionId()));
         return ImmutableMap.<String, String>builder()
                 .put("pg_billto_postal_name_first", orBlank.apply(request.getFirstName()))
                 .put("pg_billto_postal_name_last", orBlank.apply(request.getLastName()))
@@ -56,10 +58,8 @@ public class RequestFormBuilder {
                 .put("pg_transaction_order_number", request.getTransactionId())
                 .put("pg_ts_hash", pgTsHash)
                 .put("pg_return_url", returnUrl)
-                .put("pg_continue_url",
-                        request.getClientLocation()+"/complete/"+urlencoder.apply(request.getTransactionId()))
-                .put("pg_cancel_url",
-                        request.getClientLocation()+"/complete/"+urlencoder.apply(request.getTransactionId()))
+                .put("pg_continue_url", completionUrl)
+                .put("pg_cancel_url", completionUrl)
                 .put("pg_return_method", "AsyncPost")
                 .build();
     }
