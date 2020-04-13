@@ -1,5 +1,5 @@
 import com.accela.pianoforte.routes.ApiRoute;
-import com.accela.pianoforte.routes.main.AppConfig;
+import com.accela.pianoforte.main.AppConfig;
 import io.vavr.control.Try;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -36,7 +36,7 @@ public class PaymentApiTest extends CamelTestSupport {
         final String pageAddress = String.format(
                 "http://localhost:%s/pianoforte/checkout", testConfig.getRestLocalPort());
         final String result = template.requestBody(pageAddress, null, String.class);
-        assertTrue(result.contains("Provide Payer's Details for Checkout"));
+        assertTrue(result.contains("Checkout Page"));
     }
 
     @Test

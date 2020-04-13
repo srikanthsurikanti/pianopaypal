@@ -1,4 +1,4 @@
-package com.accela.pianoforte.routes.main;
+package com.accela.pianoforte.main;
 
 import io.vavr.control.Try;
 

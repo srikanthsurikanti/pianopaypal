@@ -1,6 +1,6 @@
 import com.accela.pianoforte.routes.PaymentRoute;
 import com.accela.pianoforte.routes.Processors;
-import com.accela.pianoforte.routes.main.AppConfig;
+import com.accela.pianoforte.main.AppConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +25,10 @@ public class PaymentRouteTest extends CamelTestSupport {
     private static final String jsonRequest =
             "{\"firstName\":\"Karl\",\"lastName\":\"Marx\"," +
                     "\"agency\":\"test-agency\"," +
+                    "\"addressStreet1\":\"1, Main Street\"," +
+                    "\"addressCity\":\"Burton\"," +
+                    "\"addressState\":\"CA\"," +
+                    "\"addressPostCode\":\"12345\"," +
                     "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
                     "\"transactionId\":\"1586197589861\",\"amount\":123.34}";
 
@@ -56,8 +60,12 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertTrue(fieldMap.containsKey("pg_utc_time"));
         assertEquals("urn:test-agency:transaction-id:1586197589861",fieldMap.get("pg_transaction_order_number"));
         assertTrue(fieldMap.containsKey("pg_ts_hash"));
-        assertEquals("http://localhost:9090/pianoforte/checkout",fieldMap.get("pg_continue_url"));
-        assertEquals("http://localhost:9090/pianoforte/checkout/failure",fieldMap.get("pg_cancel_url"));
+        assertEquals(
+                "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
+                fieldMap.get("pg_continue_url"));
+        assertEquals(
+                "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
+                fieldMap.get("pg_cancel_url"));
         assertEquals("http://localhost:9090/pianoforte/api/payment/return",fieldMap.get("pg_return_url"));
     }
 
@@ -99,6 +107,24 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "direct:payment-response", paymentResponseUrlencoded, paymentResponse, String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
 
+        assertEquals("1200.0", result.get("amount").asText());
+        assertEquals("TEST APPROVAL", result.get("responseText").asText());
+        assertEquals("A01", result.get("responseCode").asText());
+        assertEquals("A", result.get("responseType").asText());
+        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", result.get("traceNumber").asText());
+        assertEquals("10", result.get("transactionType").asText());
+        assertEquals("6RW586", result.get("authorizationCode").asText());
+        assertEquals("urn:test-agency:transaction-id:1586338120514", result.get("transactionId").asText());
+    }
+
+    @Test
+    @DisplayName("Payment response from provider should be cached")
+    public void testPaymentResponseCache() throws JsonProcessingException {
+        template.sendBodyAndHeaders("direct:payment-response", paymentResponseUrlencoded, paymentResponse);
+        final String response = template.requestBodyAndHeader(
+                "direct:transaction-query", null, "id", "urn:test-agency:transaction-id:1586338120514", String.class);
+        final JsonNode result = (new ObjectMapper()).readTree(response);
+        System.out.println(">>> "+result.toPrettyString());
         assertEquals("1200.0", result.get("amount").asText());
         assertEquals("TEST APPROVAL", result.get("responseText").asText());
         assertEquals("A01", result.get("responseCode").asText());

@@ -1,13 +1,17 @@
-package com.accela.pianoforte.routes.model;
+package com.accela.pianoforte.model;
 
-import com.accela.pianoforte.routes.common.HMacMD5;
-import com.accela.pianoforte.routes.common.UTCTicks;
-import com.accela.pianoforte.routes.main.AppConfig;
+import com.accela.pianoforte.common.HMacMD5;
+import com.accela.pianoforte.common.UTCTicks;
+import com.accela.pianoforte.main.AppConfig;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.vavr.control.Try;
 
+import java.net.URLEncoder;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RequestFormBuilder {
@@ -25,8 +29,7 @@ public class RequestFormBuilder {
         this.apiLoginId = config.getApiLoginId();
         this.transactionType = config.getTransactionType();
         this.apiVersion = config.getApiVersion();
-        this.returnUrl =
-                config.getBaseUrl() + config.getRestBase() + config.getRestReturnUrl();
+        this.returnUrl = config.getBaseUrl() + config.getRestBase() + config.getRestReturnUrl();
     }
 
     public Map<String,String> build(final Request request) {
@@ -35,8 +38,16 @@ public class RequestFormBuilder {
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,
                 request.getTransactionId(), apiVersion);
         return ImmutableMap.<String, String>builder()
-                .put("pg_billto_postal_name_first", request.getFirstName())
-                .put("pg_billto_postal_name_last", request.getLastName())
+                .put("pg_billto_postal_name_first", orBlank.apply(request.getFirstName()))
+                .put("pg_billto_postal_name_last", orBlank.apply(request.getLastName()))
+                .put("pg_billto_postal_name_company", orBlank.apply(request.getCompany()))
+                .put("pg_billto_postal_street_line1", request.getAddressStreet1())
+                .put("pg_billto_postal_street_line2", orBlank.apply(request.getAddressStreet2()))
+                .put("pg_billto_postal_city", request.getAddressCity())
+                .put("pg_billto_postal_stateprov", request.getAddressState())
+                .put("pg_billto_postal_postalcode", request.getAddressPostCode())
+                .put("pg_billto_telecom_phone_number", orBlank.apply(request.getTelephone()))
+                .put("pg_billto_online_email", orBlank.apply(request.getEmail()))
                 .put("pg_api_login_id",apiLoginId)
                 .put("pg_transaction_type", transactionType)
                 .put("pg_version_number", apiVersion)
@@ -45,11 +56,19 @@ public class RequestFormBuilder {
                 .put("pg_transaction_order_number", request.getTransactionId())
                 .put("pg_ts_hash", pgTsHash)
                 .put("pg_return_url", returnUrl)
-                .put("pg_continue_url", request.getClientLocation())
-                .put("pg_cancel_url", request.getClientLocation()+"/failure")
+                .put("pg_continue_url",
+                        request.getClientLocation()+"/complete/"+urlencoder.apply(request.getTransactionId()))
+                .put("pg_cancel_url",
+                        request.getClientLocation()+"/complete/"+urlencoder.apply(request.getTransactionId()))
                 .put("pg_return_method", "AsyncPost")
                 .build();
     }
+
+    private static final Function<String,String> orBlank = value ->
+            Strings.isNullOrEmpty(value) ? "" : value.trim();
+
+    private static final Function<String,String> urlencoder = value ->
+            Try.of(() -> URLEncoder.encode(value, "UTF-8")).getOrElse(value);
 
     private String calculateHash(final String userId, final String txType, final String amount,
                                  final String utcTimestamp, final String txOrderNb, final String version) {

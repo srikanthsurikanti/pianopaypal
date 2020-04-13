@@ -1,4 +1,4 @@
-package com.accela.pianoforte.routes.common;
+package com.accela.pianoforte.common;
 
 import java.time.*;
 

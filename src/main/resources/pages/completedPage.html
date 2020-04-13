@@ -1,0 +1,251 @@
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/pianoforte/css/form.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>Payment Complete Page</title>
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <b>COM-NEW-20-000224</b>
+            <p>2633 Camino Ramon</p>
+        </div>
+        <ul class="list-unstyled components">
+            <li href="#" class="option">Summary</li>
+            <li class="option">Record</li>
+            <li class="option">Status</li>
+            <li class="option">Activities (0)</li>
+            <li class="option">Workflow</li>
+            <li class="option">Inspections (6)</li>
+            <li class="option">Fee (1)</li>
+            <li class="selected">Payment</li>
+            <li class="option">Contacts (1)</li>
+            <li class="option">Professionals (0)</li>
+            <li class="option">Communications)</li>
+            <li class="option">Renewal Info</li>
+        </ul>
+    </nav>
+    <div class="container">
+        <table style="width: 400px">
+            <tbody>
+            <tr>
+                <td style="width: 35%" class="align-middle">
+                    <img id="accela-logo" src="/pianoforte/image/accela.png"/>
+                </td>
+                <td style="width: 22%; padding-top: 14px" class="align-bottom">
+                    <p>Civic Platform</p>
+                </td>
+                <td style="width: 5%; padding-top: 14px" class="align-bottom">
+                    <p>&gt;</p>
+                </td>
+                <td style="width: 30%; padding-top: 14px" class="align-bottom">
+                    <p class="label-bold">STANDARDTEST</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="col-lg-10 col-md-6 col-sm-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-12 alert alert-info">
+                            <div class="glyphicon glyphicon-info-sign">
+                                <b class="alert-info">Payment Test Client</b>
+                            </div>
+                            <div>
+                                <p>
+                                    This is a surrogate for the Civic Platform used to test the Payment Adapter.
+                                    No payment will be made, but only test details should be entered (e.g., credit-
+                                    card numbers, phone numbers) as data will be sent to an external site.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary dropdown-toggle box-shadow" type="button"
+                            data-toggle="dropdown" id="post-menu">
+                        Menu
+                        <span class="caret"></span>
+                    </button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-payment">Refund</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-reset">Void</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-cancel">Print Receipt</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-help">Help</button>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form id="payment-form" role="form">
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <input type="text" class="form-control"
+                                               name="payment-status" id="payment-status" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="amount" class="control-label">Amount</label>
+                                        <input type="text" class="form-control form-control-ro"
+                                               name="amount" id="amount" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="cardType" class="control-label">Card Type</label>
+                                        <input type="text" class="form-control form-control-ro" id="cardType"
+                                               name="cardType" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="accountNumber" class="control-label">Account Number</label>
+                                        <input type="text" class="form-control form-control-ro" id="accountNumber"
+                                               name="accountNumber" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="responseText" class="control-label">Response Text</label>
+                                        <input type="text" class="form-control form-control-ro"
+                                               name="responseText" id="responseText" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="authorizationCode" class="control-label">Authorization Code</label>
+                                        <input type="text" class="form-control form-control-ro" id="authorizationCode"
+                                               name="authorizationCode" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="cardValidity" class="control-label">Validity</label>
+                                        <input type="text" class="form-control form-control-ro" id="cardValidity"
+                                               name="cardValidity" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="companyName" class="control-label">Business Name</label>
+                                        <input type="text" class="form-control form-control-ro" id="companyName"
+                                               name="companyName" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="firstName" class="control-label">First Name</label>
+                                        <input type="text" class="form-control form-control-ro" id="firstName"
+                                               name="firstName" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="lastName" class="control-label">Last Name</label>
+                                        <input type="text" class="form-control form-control-ro" id="lastName"
+                                               name="lastName" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="addressStreet1" class="control-label">Street Address</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressStreet1"
+                                               name="addressStreet1" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="addressStreet2" class="control-label">Street Address2</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressStreet2"
+                                               name="addressStreet2" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="addressCity" class="control-label">City</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressCity"
+                                               name="addressCity" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="addressPostCode" class="control-label">Zip</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressPostCode"
+                                               name="addressPostCode" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="addressState" class="control-label">State</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressState"
+                                               name="addressState" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="telephone" class="control-label">Telephone</label>
+                                        <input type="text" class="form-control form-control-ro" id="telephone"
+                                               name="telephone" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="email" class="control-label">Card Holder's E-mail</label>
+                                        <input type="text" class="form-control form-control-ro" id="email"
+                                               name="email" readonly/>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        let path = window.location.pathname;
+        let txId = path.substring(path.lastIndexOf('/') + 1, path.length);
+        $.ajax({
+            url: '/pianoforte/api/transaction/' + txId,
+            type: 'GET',
+            accept: 'application/json; charset=UTF-8',
+            retries: 3,
+            success: populate,
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(
+                    "error querying payment response, " + textStatus + ": " + errorThrown);
+            }
+        });
+    });
+    function populate(data) {
+        console.log('data', data);
+
+        setPaymentStatus(data['responseCode']);
+
+        $('#amount').val(currencyFormat(data["amount"]));
+        $("#responseText").val(data["responseText"]);
+        $("#responseCode").val(data["responseCode"]);
+        $("#authorizationCode").val(data["authorizationCode"]);
+        $("#companyName").val(data["companyName"]);
+        $("#firstName").val(data["firstName"]);
+        $("#lastName").val(data["lastName"]);
+        $("#addressStreet1").val(data["addressStreet1"]);
+        $("#addressStreet2").val(data["addressStreet2"]);
+        $("#addressState").val(data["addressState"]);
+        $("#addressCity").val(data["addressCity"]);
+        $("#addressPostCode").val(data["addressPostCode"]);
+        $("#telephone").val(data["telephone"]);
+        $("#email").val(data["email"]);
+        $("#cardValidity").val(
+            expiryFormat(data["cardExpDateMonth"],data["cardExpDateYear"]));
+        $("#cardType").val(data["cardType"].toUpperCase());
+        $("#accountNumber").val('************'+data["last4Digits"]);
+    }
+    function setPaymentStatus(responseCode) {
+        let statusField = $('#payment-status');
+        if(responseCode === 'A01') {
+            statusField.val('Payment was successful');
+            statusField.addClass('status-success');
+        } else {
+            statusField.val('Online payment failed, error code: '+responseCode+
+                '.  Please contact your agency administrator for help');
+            statusField.addClass('status-failed');
+        }
+    }
+    function currencyFormat(amount) {
+        let formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        });
+        return formatter.format(amount);
+    }
+    function expiryFormat(month,year) {
+        return month + "/" + year;
+    }
+</script>
+
+</body>
+</html>

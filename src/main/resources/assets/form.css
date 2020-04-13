@@ -1,0 +1,132 @@
+input {
+    font-weight: lighter;
+    font-size: 15px;
+}
+input[readonly]{
+    background-color:transparent;
+    border: 0;
+    box-shadow: none;
+}
+label {
+    font-weight: lighter;
+    color: grey;
+    font-size: 15px;
+    margin-bottom: 0;
+}
+form {
+    font-weight: lighter;
+    font-size: 15px;
+}
+body {
+    font-family: 'Arial Narrow', sans-serif !important;
+}
+#accela-logo {
+    max-width:70%;
+    height:auto;
+    margin-left: 20px;
+}
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+#sidebar {
+    overflow-y: scroll;
+    min-width: 200px;
+    max-width: 200px;
+    margin-top: 10px;
+    padding-right: 0;
+    background: #f1f1f1;
+    color: grey;
+}
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: white;
+    font-size: 18px;
+    font-weight: bolder;
+}
+#sidebar ul.components {
+    color: grey;
+    font-size: 16px;
+    padding-left: 20px;
+    max-height: 100px;
+}
+#sidebar li.option {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#sidebar li.selected {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    weight: bold;
+    background: #fbfbfb;
+    color: #477ab4;
+    border: 1px solid lightgray;
+}
+.container {
+    padding-left: 0;
+    margin-left: 0;
+    border-left: 0;
+}
+.panel {
+    border: 0;
+}
+.label-bold {
+    font-weight: bold;
+}
+.form-group .required-label:after {
+    content:"  *";
+    color: #ad0000;
+}
+.form-group {
+    margin-bottom: 6px;
+}
+.form-group .form-control {
+    padding-left: 4px;
+    height: 24px;
+    line-height: 24px;
+}
+.form-group .form-control-ro {
+    font-weight: bold;
+    border: 0;
+    box-shadow: none;
+    background-color:transparent;
+}
+.form-group .status-success {
+    color: green;
+    font-size: 16px;
+    border: 0;
+    box-shadow: none;
+    background-color:transparent;
+}
+.form-group .status-failed {
+    color: red;
+    font-size: 16px;
+    border: 0;
+    box-shadow: none;
+    background-color:transparent;
+}
+.btn-primary {
+    font-weight: normal;
+    font-family: "Helvetica", serif;
+    font-size: 14px;
+    background-color: white;
+    color: #4b4b4b;
+    border-color: lightgray;
+    box-shadow: 0 1px 1px 0 lightgray;
+    padding-left: 16px;
+    margin-left: 8px;
+}
+.alert-info {
+    font-family: Arial, serif;
+}
+textarea {
+    width: 200px;
+    min-width:200px;
+    max-width:200px;
+    height:100px;
+    min-height:100px;
+    max-height:100px;
+}
