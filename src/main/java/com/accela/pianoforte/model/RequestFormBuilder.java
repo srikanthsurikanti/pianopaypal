@@ -72,9 +72,8 @@ public class RequestFormBuilder {
 
     private String calculateHash(final String userId, final String txType, final String amount,
                                  final String utcTimestamp, final String txOrderNb, final String version) {
-        final String hash = String.join("|", ImmutableList.<String>builder()
+        return HMacMD5.getHmacMD5(String.join("|", ImmutableList.<String>builder()
                 .add(userId, txType, version, amount, utcTimestamp, txOrderNb)
-                .build());
-        return HMacMD5.getHmacMD5(hash, securityKey);
+                .build()), securityKey);
     }
 }

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Contact {
-    public String company;
-    public String street1;
-    public String street2;
-    public String city;
-    public String state;
-    public String postCode;
-    public String telephone;
-    public String email;
+    private String company;
+    private String street1;
+    private String street2;
+    private String city;
+    private String state;
+    private String postCode;
+    private String telephone;
+    private String email;
 }
