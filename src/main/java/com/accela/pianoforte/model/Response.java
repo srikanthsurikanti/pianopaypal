@@ -3,28 +3,28 @@ package com.accela.pianoforte.model;
 import java.math.BigDecimal;
 
 public class Response {
-    private BigDecimal amount;
-    private String responseText;
-    private String responseCode;
-    private String responseType;
-    private String traceNumber;
-    private String transactionType;
-    private String authorizationCode;
-    private String transactionId;
-    private String companyName;
-    private String firstName;
-    private String lastName;
-    private String addressStreet1;
-    private String addressStreet2;
-    private String addressCity;
-    private String addressState;
-    private String addressPostCode;
-    private String telephone;
-    private String email;
-    private String last4Digits;
-    private String cardExpDateYear;
-    private String cardExpDateMonth;
-    private String cardType;
+    private final BigDecimal amount;
+    private final String responseText;
+    private final String responseCode;
+    private final String responseType;
+    private final String traceNumber;
+    private final String transactionType;
+    private final String authorizationCode;
+    private final String transactionId;
+    private final String companyName;
+    private final String firstName;
+    private final String lastName;
+    private final String addressStreet1;
+    private final String addressStreet2;
+    private final String addressCity;
+    private final String addressState;
+    private final String addressPostCode;
+    private final String telephone;
+    private final String email;
+    private final String last4Digits;
+    private final String cardExpDateYear;
+    private final String cardExpDateMonth;
+    private final String cardType;
 
     public Response(final BigDecimal amount, final String responseText, final String responseCode,
                     final String responseType, final String traceNumber, final String transactionType,
