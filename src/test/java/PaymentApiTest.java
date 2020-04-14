@@ -18,7 +18,7 @@ public class PaymentApiTest extends CamelTestSupport {
     private static final String endpoint = String.format(
             "http://localhost:%s/pianoforte/api/payment/checkout", testConfig.getRestLocalPort());
     private static final String jsonRequest =
-            "{\"firstName\":\"Karl\",\"lastName\":\"Marx\",\"agency\":\"test-agency\"," +
+            "{\"personalName\": {\"firstName\":\"Karl\",\"lastName\":\"Marx\"},\"agency\":\"test-agency\"," +
                     "\"transactionId\":\"1586197589861\"," +
                     "\"continueUrl\":\"http://localhost:9090/pianoforte/checkout\"," +
                     "\"amount\":123.34}";

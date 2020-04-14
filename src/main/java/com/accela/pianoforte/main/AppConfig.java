@@ -77,4 +77,8 @@ public class AppConfig {
     public String getRestReturnUrl() {
         return appProps.getProperty(REST_RETURN_URL, "");
     }
+
+    public String getResponseDescription(final String code) {
+        return appProps.getProperty("forte.response.code."+code, "("+code+" is undefined)");
+    }
 }

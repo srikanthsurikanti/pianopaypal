@@ -122,6 +122,12 @@ body {
 .alert-info {
     font-family: Arial, serif;
 }
+.alert .show {
+    display: block;
+}
+.alert .hide {
+    display: none;
+}
 textarea {
     width: 200px;
     min-width:200px;

@@ -4,15 +4,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.net.URL;
 
 @Getter
 @NoArgsConstructor
 public class Request {
     private String agency;
-    private String firstName;
-    private String lastName;
+    private PersonalName personalName;
     private String transactionId;
-    private String clientLocation;
+    private URL clientLocation;
     private BigDecimal amount;
     private Contact contact;
 

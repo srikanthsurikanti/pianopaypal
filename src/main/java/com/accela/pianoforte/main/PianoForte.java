@@ -5,15 +5,11 @@ import com.accela.pianoforte.routes.PaymentRoute;
 import com.accela.pianoforte.routes.Processors;
 import com.accela.pianoforte.services.TransactionStore;
 import org.apache.camel.main.Main;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 public class PianoForte {
-    private static final Logger logger = LoggerFactory.getLogger(PianoForte.class);
-
     public static void main(final String[] args) {
         final Main routes = new Main();
         final AppConfig appConfig = new AppConfig("/route.properties");
@@ -22,7 +18,6 @@ public class PianoForte {
         routes.addRoutesBuilder(new PaymentRoute(processors));
         routes.addRoutesBuilder(new ApiRoute(appConfig));
         routes.start();
-        logger.info("app started");
     }
 
 

@@ -40,8 +40,8 @@ public class RequestFormBuilder {
         final String completionUrl = String.format("%s/complete/%s",
                 request.getClientLocation(), urlencoder.apply(request.getTransactionId()));
         return ImmutableMap.<String, String>builder()
-                .put("pg_billto_postal_name_first", orBlank.apply(request.getFirstName()))
-                .put("pg_billto_postal_name_last", orBlank.apply(request.getLastName()))
+                .put("pg_billto_postal_name_first", orBlank.apply(request.getPersonalName().getFirstName()))
+                .put("pg_billto_postal_name_last", orBlank.apply(request.getPersonalName().getLastName()))
                 .put("pg_billto_postal_name_company", orBlank.apply(request.getContact().getCompany()))
                 .put("pg_billto_postal_street_line1", request.getContact().getStreet1())
                 .put("pg_billto_postal_street_line2", orBlank.apply(request.getContact().getStreet2()))

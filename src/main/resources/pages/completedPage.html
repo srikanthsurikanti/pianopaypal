@@ -68,9 +68,9 @@
                         Menu
                         <span class="caret"></span>
                     </button>
-                    <button type="submit" class="btn btn-primary box-shadow" id="post-payment">Refund</button>
-                    <button type="submit" class="btn btn-primary box-shadow" id="post-reset">Void</button>
-                    <button type="submit" class="btn btn-primary box-shadow" id="post-cancel">Print Receipt</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-refund">Refund</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-void">Void</button>
+                    <button type="submit" class="btn btn-primary box-shadow" id="post-receipt">Print Receipt</button>
                     <button type="submit" class="btn btn-primary box-shadow" id="post-help">Help</button>
                 </div>
                 <div class="panel-body">
@@ -78,9 +78,9 @@
                         <div class="col-lg-12">
                             <form id="payment-form" role="form">
                                 <div class="row">
-                                    <div class="form-group col-md-12">
-                                        <input type="text" class="form-control"
-                                               name="payment-status" id="payment-status" readonly/>
+                                    <div class="form-group col-md-8">
+                                        <p class="alert alert-success hide" role="alert" id="payment-status-ok"></p>
+                                        <p class="alert alert-danger hide" role="alert" id="payment-status-error"></p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -95,7 +95,7 @@
                                                name="cardType" readonly/>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="accountNumber" class="control-label">Account Number</label>
+                                        <label for="accountNumber" class="control-label">Card Number</label>
                                         <input type="text" class="form-control form-control-ro" id="accountNumber"
                                                name="accountNumber" readonly/>
                                     </div>
@@ -112,7 +112,7 @@
                                                name="authorizationCode" readonly/>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="cardValidity" class="control-label">Validity</label>
+                                        <label for="cardValidity" class="control-label">Card Validity</label>
                                         <input type="text" class="form-control form-control-ro" id="cardValidity"
                                                name="cardValidity" readonly/>
                                     </div>
@@ -201,14 +201,17 @@
         });
     });
     function populate(data) {
-        setPaymentStatus(data['responseCode']);
         let contact = data["contact"];
+        let card = data["creditCard"];
+        let outcome = data["paymentOutcome"];
+        setPaymentStatus(outcome['responseCode'],outcome['description']);
         $('#amount').val(currencyFormat(data["amount"]));
-        $("#responseText").val(data["responseText"]);
-        $("#responseCode").val(data["responseCode"]);
-        $("#authorizationCode").val(data["authorizationCode"]);
-        $("#firstName").val(data["firstName"]);
-        $("#lastName").val(data["lastName"]);
+        $("#responseText").val(outcome["responseText"]);
+        $("#responseCode").val(outcome["responseCode"]);
+        $("#authorizationCode").val(outcome["authorizationCode"]);
+        let name = data["personalName"];
+        $("#firstName").val(name["firstName"]);
+        $("#lastName").val(name["lastName"]);
         $("#companyName").val(contact["company"]);
         $("#addressStreet1").val(contact["street1"]);
         $("#addressStreet2").val(contact["street2"]);
@@ -217,20 +220,23 @@
         $("#addressPostCode").val(contact["postCode"]);
         $("#telephone").val(contact["telephone"]);
         $("#email").val(contact["email"]);
-        $("#cardValidity").val(
-            expiryFormat(data["cardExpDateMonth"],data["cardExpDateYear"]));
-        $("#cardType").val(data["cardType"].toUpperCase());
-        $("#accountNumber").val('************'+data["last4Digits"]);
+        let expiryDate = card["expiryDate"];
+        $("#cardValidity").val(expiryDate["month"]+' '+expiryDate["year"]);
+        $("#cardType").val(card["issuer"].toUpperCase());
+        $("#accountNumber").val(card["number"]);
     }
-    function setPaymentStatus(responseCode) {
-        let statusField = $('#payment-status');
+    function setPaymentStatus(responseCode,description) {
         if(responseCode === 'A01') {
-            statusField.val('Payment was successful');
-            statusField.addClass('status-success');
+            let statusField = $('#payment-status-ok');
+            statusField.addClass('show');
+            statusField.html(description+' ('+responseCode+')');
         } else {
-            statusField.val('Online payment failed, error code: '+responseCode+
-                '.  Please contact your agency administrator for help');
-            statusField.addClass('status-failed');
+            let statusField = $('#payment-status-error');
+            statusField.addClass('show');
+            statusField.html('Online payment failed: '+description+' ('
+                +responseCode+')<br>' +'Please contact your agency administrator for help');
+            $('#post-refund').prop('disabled', true);
+            $('#post-void').prop('disabled', true);
         }
     }
     function currencyFormat(amount) {
@@ -239,9 +245,6 @@
             currency: 'USD',
         });
         return formatter.format(amount);
-    }
-    function expiryFormat(month,year) {
-        return month + "/" + year;
     }
 </script>
 

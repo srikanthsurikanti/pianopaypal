@@ -192,8 +192,10 @@
                     type: 'POST',
                     contentType: 'application/json; charset=UTF-8',
                     data: JSON.stringify({
-                        firstName: $('#firstName').val(),
-                        lastName: $('#lastName').val(),
+                        personalName: {
+                            firstName: $('#firstName').val(),
+                            lastName: $('#lastName').val()
+                        },
                         agency: $('#agency').val(),
                         amount: $('#amount').val(),
                         contact: {
@@ -207,8 +209,8 @@
                             email: $('#email').val()
                         },
                         transactionId: Date.now(),
-                        clientLocation: window.location.protocol + "//" + window.location.host
-                            + window.location.pathname
+                        clientLocation: window.location.protocol
+                            + "//" + window.location.host + window.location.pathname
                     }),
                     success: doRedirect(),
                     error: function (XMLHttpRequest, textStatus, errorThrown) {

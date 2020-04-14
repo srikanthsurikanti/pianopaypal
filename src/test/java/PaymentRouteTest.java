@@ -27,7 +27,10 @@ public class PaymentRouteTest extends CamelTestSupport {
     private static final TypeReference<ArrayList<JsonNode>> typeWitness =
             new TypeReference<ArrayList<JsonNode>>() {};
     private static final String jsonRequest =
-            "{\"firstName\":\"Karl\",\"lastName\":\"Marx\"," +
+            "{\"personalName\": {" +
+                "\"firstName\":\"Karl\"," +
+                "\"lastName\":\"Marx\"" +
+             "}," +
              "\"agency\":\"test-agency\"," +
              "\"contact\": {" +
                 "\"street1\":\"1, Main Street\"," +
@@ -83,14 +86,14 @@ public class PaymentRouteTest extends CamelTestSupport {
         final String response = template.requestBodyAndHeaders(
                 "direct:payment-response", paymentResponseUrlencoded, paymentResponse, String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
-
+        final JsonNode outcome = result.get("paymentOutcome");
         assertEquals("1200.0", result.get("amount").asText());
-        assertEquals("TEST APPROVAL", result.get("responseText").asText());
-        assertEquals("A01", result.get("responseCode").asText());
-        assertEquals("A", result.get("responseType").asText());
-        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", result.get("traceNumber").asText());
+        assertEquals("TEST APPROVAL", outcome.get("responseText").asText());
+        assertEquals("A01", outcome.get("responseCode").asText());
+        assertEquals("A", outcome.get("responseType").asText());
+        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", outcome.get("traceNumber").asText());
+        assertEquals("6RW586", outcome.get("authorizationCode").asText());
         assertEquals("10", result.get("transactionType").asText());
-        assertEquals("6RW586", result.get("authorizationCode").asText());
         assertEquals("urn:test-agency:transaction-id:1586338120514", result.get("transactionId").asText());
     }
 
@@ -101,14 +104,14 @@ public class PaymentRouteTest extends CamelTestSupport {
         final String response = template.requestBodyAndHeader(
                 "direct:transaction-query", null, "id", "urn:test-agency:transaction-id:1586338120514", String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
-        System.out.println(">>> "+result.toPrettyString());
+        final JsonNode outcome = result.get("paymentOutcome");
         assertEquals("1200.0", result.get("amount").asText());
-        assertEquals("TEST APPROVAL", result.get("responseText").asText());
-        assertEquals("A01", result.get("responseCode").asText());
-        assertEquals("A", result.get("responseType").asText());
-        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", result.get("traceNumber").asText());
+        assertEquals("TEST APPROVAL", outcome.get("responseText").asText());
+        assertEquals("A01", outcome.get("responseCode").asText());
+        assertEquals("A", outcome.get("responseType").asText());
+        assertEquals("965fc3ec-f221-49ac-b54e-4e3fb4f3ce20", outcome.get("traceNumber").asText());
+        assertEquals("6RW586", outcome.get("authorizationCode").asText());
         assertEquals("10", result.get("transactionType").asText());
-        assertEquals("6RW586", result.get("authorizationCode").asText());
         assertEquals("urn:test-agency:transaction-id:1586338120514", result.get("transactionId").asText());
     }
 
