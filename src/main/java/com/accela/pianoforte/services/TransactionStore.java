@@ -1,8 +1,8 @@
 package com.accela.pianoforte.services;
 
 import com.accela.pianoforte.model.Response;
+import io.vavr.control.Option;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionStore {
@@ -16,7 +16,7 @@ public class TransactionStore {
         transactions.putIfAbsent(response.getTransactionId(), response);
     }
 
-    public Optional<Response> get(final String transactionId) {
-        return Optional.ofNullable(transactions.get(transactionId));
+    public Option<Response> get(final String transactionId) {
+        return Option.of(transactions.get(transactionId));
     }
 }

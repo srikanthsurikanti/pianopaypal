@@ -102,8 +102,10 @@ public class PaymentRouteTest extends CamelTestSupport {
     public void testPaymentResponseCache() throws JsonProcessingException {
         template.sendBodyAndHeaders("direct:payment-response", paymentResponseUrlencoded, paymentResponse);
         final String response = template.requestBodyAndHeader(
-                "direct:transaction-query", null, "id", "urn:test-agency:transaction-id:1586338120514", String.class);
+                "direct:transaction-query", null, "id",
+                "urn:test-agency:transaction-id:1586338120514", String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
+
         final JsonNode outcome = result.get("paymentOutcome");
         assertEquals("1200.0", result.get("amount").asText());
         assertEquals("TEST APPROVAL", outcome.get("responseText").asText());
@@ -113,6 +115,18 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("6RW586", outcome.get("authorizationCode").asText());
         assertEquals("10", result.get("transactionType").asText());
         assertEquals("urn:test-agency:transaction-id:1586338120514", result.get("transactionId").asText());
+    }
+
+    @Test
+    @DisplayName("Missing transaction should return error when queried")
+    public void testPaymentResponseMissing() throws JsonProcessingException {
+        final String response = template.requestBodyAndHeader(
+                "direct:transaction-query", null, "id",
+                "urn:test-agency:transaction-id:1586338120500", String.class);
+        final JsonNode result = (new ObjectMapper()).readTree(response);
+
+        System.out.println(">>> "+result.toPrettyString());
+        assertEquals("Transaction not found", result.get("error").asText());
     }
 
     @Override

@@ -35,6 +35,7 @@ body {
     min-width: 200px;
     max-width: 200px;
     margin-top: 10px;
+    margin-bottom: 20px;
     padding-right: 0;
     background: #f1f1f1;
     color: grey;
@@ -49,7 +50,6 @@ body {
     color: grey;
     font-size: 16px;
     padding-left: 20px;
-    max-height: 100px;
 }
 #sidebar li.option {
     padding-left: 10px;

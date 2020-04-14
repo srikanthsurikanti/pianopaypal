@@ -188,19 +188,30 @@
     $(document).ready(function () {
         let path = window.location.pathname;
         let txId = path.substring(path.lastIndexOf('/') + 1, path.length);
-        $.ajax({
+        let query = {
             url: '/pianoforte/api/transaction/' + txId,
             type: 'GET',
             accept: 'application/json; charset=UTF-8',
-            retries: 3,
+            retries : 10,
             success: populate,
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(
-                    "error querying payment response, " + textStatus + ": " + errorThrown);
+            error: onFail
+        };
+        $.ajax(query)
+
+        function onFail(xhr, textStatus, errorThrown) {
+            console.log('failed');
+            if (xhr.status === 404 && query.retries-- > 0) {
+                setTimeout(function () {
+                    $.ajax(call);
+                }, 1000);
+            } else {
+                console.log("error querying payment response",
+                    textStatus, errorThrown);
             }
-        });
+        }
     });
     function populate(data) {
+        console.log('success', data);
         let contact = data["contact"];
         let card = data["creditCard"];
         let outcome = data["paymentOutcome"];

@@ -4,10 +4,12 @@ import com.accela.pianoforte.main.AppConfig;
 import com.accela.pianoforte.model.*;
 import com.accela.pianoforte.services.TransactionStore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vavr.control.Try;
 import org.apache.camel.Exchange;
+import org.apache.camel.util.json.JsonObject;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -57,14 +59,6 @@ public class Processors {
                 .amount(new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")))
                 .transactionType(headers.get("pg_transaction_type"))
                 .transactionId(headers.get("pg_transaction_order_number"))
-                .paymentOutcome(PaymentOutcome.builder()
-                        .responseText(headers.get("pg_response_description"))
-                        .responseCode(headers.get("pg_response_code"))
-                        .description(
-                                appConfig.getResponseDescription(headers.get("pg_response_code")))
-                        .responseType(headers.get("pg_response_type"))
-                        .authorizationCode(headers.get("pg_authorization_code"))
-                        .traceNumber(headers.get("pg_trace_number")).build())
                 .personalName(new PersonalName(
                         headers.get("pg_billto_postal_name_first"),
                         headers.get("pg_billto_postal_name_last")))
@@ -77,6 +71,14 @@ public class Processors {
                         headers.get("pg_billto_postal_postalcode"),
                         headers.get("pg_billto_telecom_phone_number"),
                         headers.get("pg_billto_online_email")))
+                .paymentOutcome(PaymentOutcome.builder()
+                        .responseText(headers.get("pg_response_description"))
+                        .responseCode(headers.get("pg_response_code"))
+                        .description(
+                                appConfig.getResponseDescription(headers.get("pg_response_code")))
+                        .responseType(headers.get("pg_response_type"))
+                        .authorizationCode(headers.get("pg_authorization_code"))
+                        .traceNumber(headers.get("pg_trace_number")).build())
                 .creditCard(CreditCard.builder()
                         .number(headers.get("pg_last4"))
                         .expiryDate(YearMonth.of(
@@ -89,9 +91,16 @@ public class Processors {
         store.add(exchange.getIn().getBody(Response.class));
     }
 
+    private static final ObjectNode notFound = JsonNodeFactory.instance.objectNode()
+            .set("error", JsonNodeFactory.instance.textNode("Transaction not found"));
     protected void lookupResponse(final Exchange exchange) {
         store.get(exchange.getIn().getHeader("id", String.class)).map(response -> {
             exchange.getMessage().setBody(response, Response.class);
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+            return null;
+        }).getOrElse(() -> {
+            exchange.getMessage().setBody(notFound, JsonNode.class);
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
             return null;
         });
     }
