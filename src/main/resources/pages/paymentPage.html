@@ -196,7 +196,6 @@
                             firstName: $('#firstName').val(),
                             lastName: $('#lastName').val()
                         },
-                        agency: $('#agency').val(),
                         amount: $('#amount').val(),
                         contact: {
                             company: $('#company').val(),
@@ -208,7 +207,7 @@
                             telephone: $('#phone').val(),
                             email: $('#email').val()
                         },
-                        transactionId: Date.now(),
+                        transactionId: "urn:"+$('#agency').val()+":transaction-id:"+Date.now(),
                         clientLocation: window.location.protocol
                             + "//" + window.location.host + window.location.pathname
                     }),

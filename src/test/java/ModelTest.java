@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.time.YearMonth;
 import java.util.Map;
@@ -17,12 +19,12 @@ public class ModelTest {
 
     @Test
     @DisplayName("response is transformed correctly")
-    public void testBuildResponse() {
+    public void testBuildResponse() throws URISyntaxException {
         final Map<String, String> headers = paymentResponse.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
                         entry -> urldecoder.apply(entry.getValue())));
         final CreditCard.CreditCardBuilder ccBuilder = CreditCard.builder()
-                .number(headers.get("pg_last4"))
+                .number(Integer.parseInt(headers.get("pg_last4")))
                 .expiryDate(YearMonth.of(
                         Integer.parseInt(headers.get("pg_payment_card_expdate_year")),
                         Integer.parseInt(headers.get("pg_payment_card_expdate_month"))))
@@ -37,7 +39,7 @@ public class ModelTest {
                 .amount(new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")))
                 .paymentOutcome(outcomeBuilder.build())
                 .transactionType(headers.get("pg_transaction_type"))
-                .transactionId(headers.get("pg_transaction_order_number"))
+                .transactionId(new URI(headers.get("pg_transaction_order_number")))
                 .personalName(new PersonalName(
                         headers.get("pg_billto_postal_name_first"),
                         headers.get("pg_billto_postal_name_last")))

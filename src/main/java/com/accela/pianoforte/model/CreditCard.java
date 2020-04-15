@@ -8,7 +8,7 @@ import java.time.YearMonth;
 @Getter
 @Builder
 public class CreditCard {
-    private final String number;
+    private final long number;
     private final YearMonth expiryDate;
     private final String issuer;
 

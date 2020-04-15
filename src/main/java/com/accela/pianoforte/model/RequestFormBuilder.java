@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.vavr.control.Try;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class RequestFormBuilder {
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,
                 request.getTransactionId(), apiVersion);
         final String completionUrl = String.format("%s/complete/%s",
-                request.getClientLocation(), urlencoder.apply(request.getTransactionId()));
+                request.getClientLocation(), urlencoder.apply(request.getTransactionId().toString()));
         return ImmutableMap.<String, String>builder()
                 .put("pg_billto_postal_name_first", orBlank.apply(request.getPersonalName().getFirstName()))
                 .put("pg_billto_postal_name_last", orBlank.apply(request.getPersonalName().getLastName()))
@@ -55,7 +56,7 @@ public class RequestFormBuilder {
                 .put("pg_version_number", apiVersion)
                 .put("pg_total_amount", request.getAmount().toString())
                 .put("pg_utc_time", utcTime)
-                .put("pg_transaction_order_number", request.getTransactionId())
+                .put("pg_transaction_order_number", request.getTransactionId().toString())
                 .put("pg_ts_hash", pgTsHash)
                 .put("pg_return_url", returnUrl)
                 .put("pg_continue_url", completionUrl)
@@ -71,9 +72,9 @@ public class RequestFormBuilder {
             Try.of(() -> URLEncoder.encode(value, "UTF-8")).getOrElse(value);
 
     private String calculateHash(final String userId, final String txType, final String amount,
-                                 final String utcTimestamp, final String txOrderNb, final String version) {
+                                 final String utcTimestamp, final URI txOrderNb, final String version) {
         return HMacMD5.getHmacMD5(String.join("|", ImmutableList.<String>builder()
-                .add(userId, txType, version, amount, utcTimestamp, txOrderNb)
+                .add(userId, txType, version, amount, utcTimestamp, txOrderNb.toString())
                 .build()), securityKey);
     }
 }

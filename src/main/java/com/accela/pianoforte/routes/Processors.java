@@ -6,10 +6,13 @@ import com.accela.pianoforte.services.TransactionStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.vavr.Tuple2;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.apache.camel.Exchange;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
@@ -19,8 +22,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+
 public class Processors {
-    private static final JsonNodeFactory factory = JsonNodeFactory.instance;
+    private static final JsonNodeFactory factory = instance;
     private final RequestFormBuilder formBuilder;
     private final AppConfig appConfig;
     private final TransactionStore store;
@@ -56,7 +61,8 @@ public class Processors {
         exchange.getMessage().setBody(Response.builder()
                 .amount(new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")))
                 .transactionType(headers.get("pg_transaction_type"))
-                .transactionId(headers.get("pg_transaction_order_number"))
+                .transactionId(
+                        Try.of(() -> new URI(headers.get("pg_transaction_order_number"))).getOrNull())
                 .personalName(new PersonalName(
                         headers.get("pg_billto_postal_name_first"),
                         headers.get("pg_billto_postal_name_last")))
@@ -78,7 +84,7 @@ public class Processors {
                         .authorizationCode(headers.get("pg_authorization_code"))
                         .traceNumber(headers.get("pg_trace_number")).build())
                 .creditCard(CreditCard.builder()
-                        .number(headers.get("pg_last4"))
+                        .number(Integer.parseInt(headers.get("pg_last4")))
                         .expiryDate(YearMonth.of(
                                 Integer.parseInt(headers.get("pg_payment_card_expdate_year")),
                                 Integer.parseInt(headers.get("pg_payment_card_expdate_month"))))
@@ -86,21 +92,18 @@ public class Processors {
     }
 
     protected void storeResponse(final Exchange exchange) {
-        store.add(exchange.getIn().getBody(Response.class));
+        store.add(Option.of(exchange.getIn().getBody(Response.class)));
     }
 
-    private static final ObjectNode notFound = JsonNodeFactory.instance.objectNode()
-            .set("error", JsonNodeFactory.instance.textNode("Transaction not found"));
+    private static final ObjectNode notFound =
+            instance.objectNode().set("error", instance.textNode("Transaction not found"));
+
     protected void lookupResponse(final Exchange exchange) {
-        store.get(exchange.getIn().getHeader("id", String.class)).map(response -> {
-            exchange.getMessage().setBody(response, Response.class);
-            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
-            return null;
-        }).getOrElse(() -> {
-            exchange.getMessage().setBody(notFound, JsonNode.class);
-            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
-            return null;
-        });
+        final Tuple2<Object,Integer> result = store.get(exchange.getIn().getHeader("id", URI.class))
+                .map(response -> new Tuple2<Object,Integer>(response, 200))
+                .getOrElse(() -> new Tuple2<>(notFound, 404));
+        exchange.getMessage().setBody(result._1, result._1.getClass());
+        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, result._2);
     }
 
     private static final Function<Object,String> urldecoder = encoded ->

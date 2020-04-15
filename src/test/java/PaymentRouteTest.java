@@ -31,7 +31,6 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "\"firstName\":\"Karl\"," +
                 "\"lastName\":\"Marx\"" +
              "}," +
-             "\"agency\":\"test-agency\"," +
              "\"contact\": {" +
                 "\"street1\":\"1, Main Street\"," +
                 "\"city\":\"Burton\"," +
@@ -39,7 +38,7 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "\"postCode\":\"12345\"" +
              "}," +
              "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
-             "\"transactionId\":\"1586197589861\",\"amount\":123.34}";
+             "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\",\"amount\":123.34}";
 
     @Test
     @DisplayName("Payment request should return redirect query document")
@@ -120,12 +119,10 @@ public class PaymentRouteTest extends CamelTestSupport {
     @Test
     @DisplayName("Missing transaction should return error when queried")
     public void testPaymentResponseMissing() throws JsonProcessingException {
-        final String response = template.requestBodyAndHeader(
-                "direct:transaction-query", null, "id",
-                "urn:test-agency:transaction-id:1586338120500", String.class);
+        final String response = template.requestBodyAndHeader("direct:transaction-query", null,
+                "id", "urn:test-agency:transaction-id:1586338120500", String.class);
         final JsonNode result = (new ObjectMapper()).readTree(response);
 
-        System.out.println(">>> "+result.toPrettyString());
         assertEquals("Transaction not found", result.get("error").asText());
     }
 
