@@ -14,5 +14,6 @@ public class Request {
     private URI transactionId;
     private URL clientLocation;
     private BigDecimal amount;
+    private String transactionType;
     private Contact contact;
 }

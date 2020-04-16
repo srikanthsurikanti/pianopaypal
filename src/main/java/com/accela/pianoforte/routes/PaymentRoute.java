@@ -25,6 +25,7 @@ public class PaymentRoute extends RouteBuilder {
                 .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON));
 
         from("direct:payment-response")
+                .to("log:com.accela?level=INFO&showAll=true")
                 .process(processors::parseResponse)
                 .process(processors::storeResponse)
                 .marshal().json(JsonLibrary.Jackson)

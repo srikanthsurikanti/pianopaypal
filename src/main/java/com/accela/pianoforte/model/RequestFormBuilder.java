@@ -19,21 +19,22 @@ public class RequestFormBuilder {
     private final Supplier<OffsetDateTime> timestamper;
     private final String securityKey;
     private final String apiLoginId;
-    private final String transactionType;
     private final String apiVersion;
     private final String returnUrl;
+    private final AppConfig config;
 
     public RequestFormBuilder(
             final Supplier<OffsetDateTime> timestamper, final AppConfig config) {
         this.timestamper = timestamper;
+        this.config = config;
         this.securityKey = config.getSecurityKey();
         this.apiLoginId = config.getApiLoginId();
-        this.transactionType = config.getTransactionType();
         this.apiVersion = config.getApiVersion();
         this.returnUrl = config.getBaseUrl() + config.getRestBase() + config.getRestReturnUrl();
     }
 
     public Map<String,String> build(final Request request) {
+        final String transactionType = config.mapTransactionType(request.getTransactionType());
         final String utcTime = UTCTicks.getUtcTime(timestamper.get()).toString();
         final String pgTsHash = calculateHash(
                 apiLoginId, transactionType, request.getAmount().toString(), utcTime,

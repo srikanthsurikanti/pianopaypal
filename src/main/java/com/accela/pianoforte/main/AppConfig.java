@@ -46,8 +46,8 @@ public class AppConfig {
         return appProps.getProperty(API_VERSION, "");
     }
 
-    public String getTransactionType() {
-        return appProps.getProperty(TRANSACTION_CCARD_SALE, "");
+    public String mapTransactionType(final String code) {
+        return appProps.getProperty("forte.transaction.code."+code,"");
     }
 
     public String getRestContextPath() {

@@ -20,6 +20,7 @@ public class PaymentApiTest extends CamelTestSupport {
     private static final String jsonRequest =
             "{\"personalName\": {\"firstName\":\"Karl\",\"lastName\":\"Marx\"},\"agency\":\"test-agency\"," +
                     "\"transactionId\":\"1586197589861\"," +
+                    "\"transactionType\":\"EC\"," +
                     "\"continueUrl\":\"http://localhost:9090/pianoforte/checkout\"," +
                     "\"amount\":123.34}";
 
@@ -77,7 +78,7 @@ public class PaymentApiTest extends CamelTestSupport {
                 "{\"pg_billto_postal_name_first\":\"Karl\"}," +
                 "{\"pg_billto_postal_name_last\":\"Marx\"}," +
                 "{\"pg_api_login_id\":\"9F3FA809B8\"}," +
-                "{\"pg_transaction_type\":\"10\"}," +
+                "{\"pg_transaction_type\":\"20\"}," +
                 "{\"pg_version_number\":\"1.0\"},{\"pg_total_amount\":\"123.34\"}," +
                 "{\"pg_utc_time\":\"637219276208950000\"}," +
                 "{\"pg_transaction_order_number\":\"urn:test-agency:transaction-id:1586197589861\"}," +

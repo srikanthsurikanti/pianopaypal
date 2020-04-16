@@ -7,12 +7,13 @@ import java.time.YearMonth;
 
 @Getter
 @Builder
-public class CreditCard {
+public class Instrument {
+    private final String type;
     private final long number;
     private final YearMonth expiryDate;
     private final String issuer;
 
     public String getNumber() {
-        return "************"+number;
+        return String.format("************%04d",number);
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vavr.Tuple2;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PaymentRouteTest extends CamelTestSupport {
     private static final TypeReference<ArrayList<JsonNode>> typeWitness =
             new TypeReference<ArrayList<JsonNode>>() {};
-    private static final String jsonRequest =
+    private static final String jsonRequestCC =
             "{\"personalName\": {" +
                 "\"firstName\":\"Karl\"," +
                 "\"lastName\":\"Marx\"" +
@@ -38,13 +39,28 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "\"postCode\":\"12345\"" +
              "}," +
              "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
-             "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\",\"amount\":123.34}";
+             "\"transactionType\":\"CC\",\"amount\":123.34," +
+             "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\"}";
+    private static final String jsonRequestEC =
+            "{\"personalName\": {" +
+                    "\"firstName\":\"Karl\"," +
+                    "\"lastName\":\"Marx\"" +
+                    "}," +
+                    "\"contact\": {" +
+                    "\"street1\":\"1, Main Street\"," +
+                    "\"city\":\"Burton\"," +
+                    "\"state\":\"CA\"," +
+                    "\"postCode\":\"12345\"" +
+                    "}," +
+                    "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
+                    "\"transactionType\":\"EC\",\"amount\":123.34," +
+                    "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\"}";
 
     @Test
-    @DisplayName("Payment request should return redirect query document")
-    public void testPaymentRequest() throws JsonProcessingException {
+    @DisplayName("Credit Card Payment request should return redirect query document")
+    public void testCCPaymentRequest() throws JsonProcessingException {
         final String response = template.requestBodyAndHeader("direct:payment-checkout",
-                jsonRequest, Exchange.CONTENT_TYPE, "application/json", String.class);
+                jsonRequestCC, Exchange.CONTENT_TYPE, "application/json", String.class);
 
         final JsonNode result = (new ObjectMapper()).readTree(response);
         assertEquals("POST", result.get("method").asText());
@@ -69,6 +85,17 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
                 fieldMap.get("pg_cancel_url"));
         assertEquals("http://localhost:9090/pianoforte/api/payment/return",fieldMap.get("pg_return_url"));
+    }
+
+    @Test
+    @DisplayName("eCheck Payment request should return redirect query document")
+    public void testECPaymentRequest() throws JsonProcessingException {
+        final String response = template.requestBodyAndHeader("direct:payment-checkout",
+                jsonRequestEC, Exchange.CONTENT_TYPE, "application/json", String.class);
+
+        final JsonNode result = (new ObjectMapper()).readTree(response);
+        final Map<String, String> fieldMap = mapResponse(result);
+        assertEquals("20", fieldMap.get("pg_transaction_type"));
     }
 
     private Map<String, String> mapResponse(final JsonNode result) {

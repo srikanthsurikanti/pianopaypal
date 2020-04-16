@@ -6,6 +6,7 @@ import com.accela.pianoforte.services.TransactionStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -23,6 +24,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+import static io.vavr.API.For;
+import static java.lang.Integer.parseInt;
 
 public class Processors {
     private static final JsonNodeFactory factory = instance;
@@ -52,57 +55,70 @@ public class Processors {
     }
 
     protected void parseResponse(final Exchange exchange) {
-        final Map<String, String> headers = exchange.getIn()
+        final Map<String, String> fields = exchange.getIn()
                 .getHeaders().entrySet().stream()
-                    .filter(e -> e.getValue() instanceof String)
+                    .filter(e -> e.getKey().startsWith("pg_"))
                     .collect(Collectors.toMap(Map.Entry::getKey,
                             entry -> urldecoder.apply(entry.getValue())));
 
         exchange.getMessage().setBody(Response.builder()
-                .amount(new BigDecimal(headers.get("pg_total_amount").replaceAll(",", "")))
-                .transactionType(headers.get("pg_transaction_type"))
+                .amount(new BigDecimal(fields.get("pg_total_amount").replaceAll(",", "")))
+                .transactionType(fields.get("pg_transaction_type"))
                 .transactionId(
-                        Try.of(() -> new URI(headers.get("pg_transaction_order_number"))).getOrNull())
+                        Try.of(() -> new URI(fields.get("pg_transaction_order_number"))).getOrNull())
                 .personalName(new PersonalName(
-                        headers.get("pg_billto_postal_name_first"),
-                        headers.get("pg_billto_postal_name_last")))
+                        fields.get("pg_billto_postal_name_first"),
+                        fields.get("pg_billto_postal_name_last")))
                 .contact(new Contact(
-                        headers.get("pg_billto_postal_name_company"),
-                        headers.get("pg_billto_postal_street_line1"),
-                        headers.get("pg_billto_postal_street_line2"),
-                        headers.get("pg_billto_postal_city"),
-                        headers.get("pg_billto_postal_stateprov"),
-                        headers.get("pg_billto_postal_postalcode"),
-                        headers.get("pg_billto_telecom_phone_number"),
-                        headers.get("pg_billto_online_email")))
+                        fields.get("pg_billto_postal_name_company"),
+                        fields.get("pg_billto_postal_street_line1"),
+                        fields.get("pg_billto_postal_street_line2"),
+                        fields.get("pg_billto_postal_city"),
+                        fields.get("pg_billto_postal_stateprov"),
+                        fields.get("pg_billto_postal_postalcode"),
+                        fields.get("pg_billto_telecom_phone_number"),
+                        fields.get("pg_billto_online_email")))
                 .paymentOutcome(PaymentOutcome.builder()
-                        .responseText(headers.get("pg_response_description"))
-                        .responseCode(headers.get("pg_response_code"))
+                        .responseText(fields.get("pg_response_description"))
+                        .responseCode(fields.get("pg_response_code"))
                         .description(
-                                appConfig.getResponseDescription(headers.get("pg_response_code")))
-                        .responseType(headers.get("pg_response_type"))
-                        .authorizationCode(headers.get("pg_authorization_code"))
-                        .traceNumber(headers.get("pg_trace_number")).build())
-                .creditCard(CreditCard.builder()
-                        .number(Integer.parseInt(headers.get("pg_last4")))
-                        .expiryDate(YearMonth.of(
-                                Integer.parseInt(headers.get("pg_payment_card_expdate_year")),
-                                Integer.parseInt(headers.get("pg_payment_card_expdate_month"))))
-                        .issuer(headers.get("pg_payment_card_type")).build()).build(), Response.class);
+                                appConfig.getResponseDescription(fields.get("pg_response_code")))
+                        .responseType(fields.get("pg_response_type"))
+                        .authorizationCode(fields.get("pg_authorization_code"))
+                        .traceNumber(fields.get("pg_trace_number")).build())
+                .instrument(buildInstrument(fields)).build(), Response.class);
+    }
+
+    private static Instrument buildInstrument(final Map<String, String> fields) {
+        final Instrument.InstrumentBuilder builder = Instrument.builder()
+                .number(parseInt(fields.get("pg_last4")))
+                .type("EC");
+        final Option<Instrument> instrument = For(
+                Option.of(fields.get("pg_payment_card_expdate_year")),
+                Option.of(fields.get("pg_payment_card_expdate_month")),
+                Option.of(fields.get("pg_payment_card_type"))
+        ).yield((year, month, issuer) ->
+                builder.expiryDate(YearMonth.of(parseInt(year), parseInt(month)))
+                        .issuer(issuer)
+                        .type("CC")
+                        .build()
+        );
+        return instrument.getOrElse(builder.build());
     }
 
     protected void storeResponse(final Exchange exchange) {
         store.add(Option.of(exchange.getIn().getBody(Response.class)));
     }
 
-    private static final ObjectNode notFound =
-            instance.objectNode().set("error", instance.textNode("Transaction not found"));
+    private static final Map<String, String> notFound =
+            ImmutableMap.<String, String>builder()
+                    .put("error", "Transaction not found").build();
 
     protected void lookupResponse(final Exchange exchange) {
         final Tuple2<Object,Integer> result = store.get(exchange.getIn().getHeader("id", URI.class))
                 .map(response -> new Tuple2<Object,Integer>(response, 200))
                 .getOrElse(() -> new Tuple2<>(notFound, 404));
-        exchange.getMessage().setBody(result._1, result._1.getClass());
+        exchange.getMessage().setBody(result._1);
         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, result._2);
     }
 

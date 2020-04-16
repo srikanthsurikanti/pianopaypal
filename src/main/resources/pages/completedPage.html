@@ -84,44 +84,15 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label for="amount" class="control-label">Amount</label>
                                         <input type="text" class="form-control form-control-ro"
                                                name="amount" id="amount" readonly/>
                                     </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="cardType" class="control-label">Card Type</label>
-                                        <input type="text" class="form-control form-control-ro" id="cardType"
-                                               name="cardType" readonly/>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="accountNumber" class="control-label">Card Number</label>
-                                        <input type="text" class="form-control form-control-ro" id="accountNumber"
-                                               name="accountNumber" readonly/>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-4">
-                                        <label for="responseText" class="control-label">Response Text</label>
+                                    <div class="form-group col-md-2">
+                                        <label for="paymentType" class="control-label">Payment Type</label>
                                         <input type="text" class="form-control form-control-ro"
-                                               name="responseText" id="responseText" readonly/>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="authorizationCode" class="control-label">Authorization Code</label>
-                                        <input type="text" class="form-control form-control-ro" id="authorizationCode"
-                                               name="authorizationCode" readonly/>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="cardValidity" class="control-label">Card Validity</label>
-                                        <input type="text" class="form-control form-control-ro" id="cardValidity"
-                                               name="cardValidity" readonly/>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-4">
-                                        <label for="companyName" class="control-label">Business Name</label>
-                                        <input type="text" class="form-control form-control-ro" id="companyName"
-                                               name="companyName" readonly/>
+                                               name="paymentType" id="paymentType" readonly/>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="firstName" class="control-label">First Name</label>
@@ -136,6 +107,11 @@
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
+                                        <label for="companyName" class="control-label">Business Name</label>
+                                        <input type="text" class="form-control form-control-ro" id="companyName"
+                                               name="companyName" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
                                         <label for="addressStreet1" class="control-label">Street Address</label>
                                         <input type="text" class="form-control form-control-ro" id="addressStreet1"
                                                name="addressStreet1" readonly/>
@@ -145,22 +121,22 @@
                                         <input type="text" class="form-control form-control-ro" id="addressStreet2"
                                                name="addressStreet2" readonly/>
                                     </div>
+                                </div>
+                                <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="addressCity" class="control-label">City</label>
                                         <input type="text" class="form-control form-control-ro" id="addressCity"
                                                name="addressCity" readonly/>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-4">
-                                        <label for="addressPostCode" class="control-label">Zip</label>
-                                        <input type="text" class="form-control form-control-ro" id="addressPostCode"
-                                               name="addressPostCode" readonly/>
-                                    </div>
                                     <div class="form-group col-md-4">
                                         <label for="addressState" class="control-label">State</label>
                                         <input type="text" class="form-control form-control-ro" id="addressState"
                                                name="addressState" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="addressPostCode" class="control-label">Zip</label>
+                                        <input type="text" class="form-control form-control-ro" id="addressPostCode"
+                                               name="addressPostCode" readonly/>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -170,9 +146,38 @@
                                                name="telephone" readonly/>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="email" class="control-label">Card Holder's E-mail</label>
+                                        <label for="email" class="control-label">Email Address</label>
                                         <input type="text" class="form-control form-control-ro" id="email"
                                                name="email" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="accountNumber" class="control-label">Account Number</label>
+                                        <input type="text" class="form-control form-control-ro" id="accountNumber"
+                                               name="accountNumber" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="responseText" class="control-label">Response Text</label>
+                                        <input type="text" class="form-control form-control-ro"
+                                               name="responseText" id="responseText" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="authorizationCode" class="control-label">Authorization Code</label>
+                                        <input type="text" class="form-control form-control-ro" id="authorizationCode"
+                                               name="authorizationCode" readonly/>
+                                    </div>
+                                </div>
+                                <div class="row" id="cardDetails" hidden>
+                                    <div class="form-group col-md-4">
+                                        <label for="cardType" class="control-label">Card Type</label>
+                                        <input type="text" class="form-control form-control-ro" id="cardType"
+                                               name="cardType" readonly/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="cardValidity" class="control-label">Card Validity</label>
+                                        <input type="text" class="form-control form-control-ro" id="cardValidity"
+                                               name="cardValidity" readonly/>
                                     </div>
                                 </div>
                             </form>
@@ -192,7 +197,7 @@
             url: '/pianoforte/api/transaction/' + txId,
             type: 'GET',
             accept: 'application/json; charset=UTF-8',
-            retries : 10,
+            retries: 10,
             success: populate,
             error: onFail
         };
@@ -210,12 +215,13 @@
             }
         }
     });
+
     function populate(data) {
         console.log('success', data);
         let contact = data["contact"];
-        let card = data["creditCard"];
+        let instrument = data["instrument"];
         let outcome = data["paymentOutcome"];
-        setPaymentStatus(outcome['responseCode'],outcome['description']);
+        setPaymentStatus(outcome['responseCode'], outcome['description']);
         $('#amount').val(currencyFormat(data["amount"]));
         $("#responseText").val(outcome["responseText"]);
         $("#responseCode").val(outcome["responseCode"]);
@@ -231,25 +237,35 @@
         $("#addressPostCode").val(contact["postCode"]);
         $("#telephone").val(contact["telephone"]);
         $("#email").val(contact["email"]);
-        let expiryDate = card["expiryDate"];
-        $("#cardValidity").val(expiryDate["month"]+' '+expiryDate["year"]);
-        $("#cardType").val(card["issuer"].toUpperCase());
-        $("#accountNumber").val(card["number"]);
+        $("#accountNumber").val(instrument["number"]);
+        if(instrument['type'] === 'CC') {
+            $("label[for='accountNumber']").text("Card Number");
+            $("#paymentType").val('Credit Card');
+            let expiryDate = instrument["expiryDate"];
+            $("#cardValidity").val(expiryDate["month"] + ' ' + expiryDate["year"]);
+            $("#cardType").val(instrument["issuer"].toUpperCase());
+        } else {
+            $("label[for='accountNumber']").text('Account Number');
+            $("#paymentType").val('eCheck');
+            $("#cardDetails").hide();
+        }
     }
-    function setPaymentStatus(responseCode,description) {
-        if(responseCode === 'A01') {
+
+    function setPaymentStatus(responseCode, description) {
+        if (responseCode === 'A01') {
             let statusField = $('#payment-status-ok');
             statusField.addClass('show');
-            statusField.html(description+' ('+responseCode+')');
+            statusField.html(description + ' (' + responseCode + ')');
         } else {
             let statusField = $('#payment-status-error');
             statusField.addClass('show');
-            statusField.html('Online payment failed: '+description+' ('
-                +responseCode+')<br>' +'Please contact your agency administrator for help');
+            statusField.html('Online payment failed: ' + description + ' ('
+                + responseCode + ')<br>' + 'Please contact your agency administrator for help');
             $('#post-refund').prop('disabled', true);
             $('#post-void').prop('disabled', true);
         }
     }
+
     function currencyFormat(amount) {
         let formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',

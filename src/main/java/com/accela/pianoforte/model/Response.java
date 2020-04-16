@@ -11,7 +11,7 @@ import java.net.URI;
 public class Response {
     private final BigDecimal amount;
     private final Contact contact;
-    private final CreditCard creditCard;
+    private final Instrument instrument;
     private final PersonalName personalName;
     private final PaymentOutcome paymentOutcome;
     private final String transactionType;
