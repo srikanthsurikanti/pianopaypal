@@ -38,7 +38,7 @@ public class PaymentRouteTest extends CamelTestSupport {
                 "\"state\":\"CA\"," +
                 "\"postCode\":\"12345\"" +
              "}," +
-             "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
+             "\"clientLocation\":\"http://localhost:9090/pianopaypal/checkout\"," +
              "\"transactionType\":\"CC\",\"amount\":123.34," +
              "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\"}";
     private static final String jsonRequestEC =
@@ -52,7 +52,7 @@ public class PaymentRouteTest extends CamelTestSupport {
                     "\"state\":\"CA\"," +
                     "\"postCode\":\"12345\"" +
                     "}," +
-                    "\"clientLocation\":\"http://localhost:9090/pianoforte/checkout\"," +
+                    "\"clientLocation\":\"http://localhost:9090/pianopaypal/checkout\"," +
                     "\"transactionType\":\"EC\",\"amount\":123.34," +
                     "\"transactionId\":\"urn:test-agency:transaction-id:1586197589861\"}";
 
@@ -79,12 +79,12 @@ public class PaymentRouteTest extends CamelTestSupport {
         assertEquals("3A98C930C5620F4BF1BABEEEA46C7DC9", fieldMap.get("pg_ts_hash"));
         assertTrue(fieldMap.containsKey("pg_ts_hash"));
         assertEquals(
-                "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
+                "http://localhost:9090/pianopaypal/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
                 fieldMap.get("pg_continue_url"));
         assertEquals(
-                "http://localhost:9090/pianoforte/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
+                "http://localhost:9090/pianopaypal/checkout/complete/urn%3Atest-agency%3Atransaction-id%3A1586197589861",
                 fieldMap.get("pg_cancel_url"));
-        assertEquals("http://localhost:9090/pianoforte/api/payment/return",fieldMap.get("pg_return_url"));
+        assertEquals("http://localhost:9090/pianopaypal/api/payment/return",fieldMap.get("pg_return_url"));
     }
 
     @Test

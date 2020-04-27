@@ -30,7 +30,8 @@ public class PaymentRoute extends RouteBuilder {
                 .process(processors::storeResponse)
                 .marshal().json(JsonLibrary.Jackson)
                 .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON))
-                .to("direct:platform");
+                .to("direct:platform")
+                .to("direct:completed-page");
 
         from("direct:platform")
                 .process(exch ->

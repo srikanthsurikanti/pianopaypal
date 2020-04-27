@@ -42,6 +42,9 @@ public class ApiRoute extends RouteBuilder {
                     .to("direct:payment-checkout")
                 .post(appConfig.getRestReturnUrl())
                     .to("direct:payment-response")
+                 .get(appConfig.getRestReturnUrl())
+                    .to("direct:payment-response")
+                    
                 .get("/transaction/{id}")
                     .to("direct:transaction-query");
 
@@ -50,7 +53,7 @@ public class ApiRoute extends RouteBuilder {
                 .setHeader(CONTENT_TYPE, constant(TEXT_HTML.toString()))
                 .process(ApiRoute::streamAsset);
 
-        from("direct:completed-page")
+        from("direct:completed-page").id("checkout-route")
                 .setProperty("asset", simple("pages/completedPage.html"))
                 .setHeader(CONTENT_TYPE, constant(TEXT_HTML.toString()))
                 .process(ApiRoute::streamAsset);

@@ -18,6 +18,7 @@ ext {
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.12'
+    compile group: 'com.paypal.sdk', name: 'rest-api-sdk', version: '1.14.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     implementation "org.apache.camel:camel-core:${camelVersion}"
     implementation "org.apache.camel:camel-endpointdsl:${camelVersion}"

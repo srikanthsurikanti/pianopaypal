@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PaymentApiTest extends CamelTestSupport {
     private static final AppConfig testConfig = getConfiguration();
     private static final String endpoint = String.format(
-            "http://localhost:%s/pianoforte/api/payment/checkout", testConfig.getRestLocalPort());
+            "http://localhost:%s/pianopaypal/api/payment/checkout", testConfig.getRestLocalPort());
     private static final String jsonRequest =
             "{\"personalName\": {\"firstName\":\"Karl\",\"lastName\":\"Marx\"},\"agency\":\"test-agency\"," +
                     "\"transactionId\":\"1586197589861\"," +
                     "\"transactionType\":\"EC\"," +
-                    "\"continueUrl\":\"http://localhost:9090/pianoforte/checkout\"," +
+                    "\"continueUrl\":\"http://localhost:9090/pianopaypal/checkout\"," +
                     "\"amount\":123.34}";
 
     @Test
@@ -36,7 +36,7 @@ public class PaymentApiTest extends CamelTestSupport {
     @DisplayName("Checkout page served")
     public void testCheckoutPage() {
         final String pageAddress = String.format(
-                "http://localhost:%s/pianoforte/checkout", testConfig.getRestLocalPort());
+                "http://localhost:%s/pianopaypal/checkout", testConfig.getRestLocalPort());
         final String result = template.requestBody(pageAddress, null, String.class);
         assertTrue(result.contains("Checkout Page"));
     }
@@ -45,7 +45,7 @@ public class PaymentApiTest extends CamelTestSupport {
     @DisplayName("Response page served")
     public void testResponsePage() {
         final String pageAddress = String.format(
-                "http://localhost:%s/pianoforte/api/payment/return", testConfig.getRestLocalPort());
+                "http://localhost:%s/pianopaypal/api/payment/return", testConfig.getRestLocalPort());
         final String result = template.requestBody(
                 pageAddress, paymentResponseUrlencoded, String.class);
         assertEquals("{}", result);
@@ -83,9 +83,9 @@ public class PaymentApiTest extends CamelTestSupport {
                 "{\"pg_utc_time\":\"637219276208950000\"}," +
                 "{\"pg_transaction_order_number\":\"urn:test-agency:transaction-id:1586197589861\"}," +
                 "{\"pg_ts_hash\":\"BB1AF00676B1FF5585F8192D4A942672\"}," +
-                "{\"pg_return_url\":\"http://localhost:9090/pianoforte/api/payment/return\"}," +
-                "{\"pg_continue_url\":\"http://localhost:9090/pianoforte/checkout\"}," +
-                "{\"pg_cancel_url\":\"http://localhost:9090/pianoforte/api/payment/cancel\"}]," +
+                "{\"pg_return_url\":\"http://localhost:9090/pianopaypal/api/payment/return\"}," +
+                "{\"pg_continue_url\":\"http://localhost:9090/pianopaypal/checkout\"}," +
+                "{\"pg_cancel_url\":\"http://localhost:9090/pianopaypal/api/payment/cancel\"}]," +
             "\"url\":\"https://sandbox.paymentsgateway.net/swp/co/default.aspx\"," +
             "\"method\":\"POST\"," +
             "\"contentType\":\"application/x-www-form-urlencoded\"}";
